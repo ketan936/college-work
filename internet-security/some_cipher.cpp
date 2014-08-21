@@ -2,5 +2,6 @@
 using namespace std;
 
 int main(){
-cout<<"hello world";
+string s = "hello";
+cout << s;
 }
