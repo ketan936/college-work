@@ -1,5 +1,6 @@
 #include <iostream>
 #include <stack>
+#include <string>
 using namespace std;
 
 stack<int> create_stack(int level) {
@@ -12,7 +13,14 @@ stack<int> create_stack(int level) {
 	}
 	return my_stack;
 }
+string reverse(string s) {
+	string result = "";
+	for (int i = 0; i < s.length(); i++) {
+		result = s[i] + result;
+	}
 
+	return result;
+}
 string remove_x(string str, char x) {
 	string output;
 	for (size_t i = 0; i < str.size(); ++i)
@@ -68,20 +76,30 @@ int main() {
 	for (int i = 3; i == 3; i++) {
 		cout << "Checking for level: " << i << endl;
 		string other_parts[i];
-		int length_of_top= encrypted.length()/i;
-		other_parts[i-1]=encrypted.substr(encrypted.length()-length_of_top-1,length_of_top-1);
-		other_parts[0]=encrypted.substr(0,length_of_top);
+		int length_of_top = encrypted.length() / i;
+		other_parts[i - 1] = encrypted.substr(
+				encrypted.length() - length_of_top - 1, length_of_top - 1);
+		other_parts[0] = encrypted.substr(0, length_of_top);
 
-		int lenght_of_rest = (length_of_top*2)-2;
-		for (int it = 1; it < i-1; ++it) {
-			other_parts[it]=encrypted.substr(length_of_top+(lenght_of_rest*(it-1)),lenght_of_rest);
+		int lenght_of_rest = (length_of_top * 2) - 2;
+		for (int it = 1; it < i - 1; ++it) {
+			other_parts[it] = encrypted.substr(
+					length_of_top + (lenght_of_rest * (it - 1)),
+					lenght_of_rest);
 		}
 
 		cout << "other_parts are: " << endl;
 		for (int k = 0; k < i; ++k) {
-				cout << other_parts[k] << endl;
-			}
-
+			cout << other_parts[k] << endl;
+		}
+		string result;
+		for (int k = 0; k < i; ++k) {
+		string temp = other_parts[k];
+		if (k%2!=0)
+			temp=reverse(temp);
+		result+=temp;
+		}
+		cout<<"unencrypted string is: "<<remove_x(result,'x')<<endl;
 	}
 
 }
