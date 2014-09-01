@@ -1,0 +1,70 @@
+
+<html>
+<head>
+<title>Forms</title>
+<link rel="stylesheet" href="form.css" type="text/css" media="screen" title="no title" charset="utf-8"/>
+<h1></h1>
+</head>
+<style>
+.cntr
+{
+margin-left:30%;
+}
+</style>
+<body>
+<br/>
+<fieldset><legend> Login </legend>
+<form class="basic-grey">
+<div class="cntr">
+Username <input type="text" ><br/>
+Password <input type="password"> <br/> 
+</div>
+</form>
+</fieldset>
+<br/>
+<fieldset><legend> Choices </legend>
+<form class="basic-grey">
+
+<div class="cntr">
+Favourite color <input type="text"><br/><br/>
+Favourite fruit <select>
+ <option value="mango">Mango</option>
+  <option value="apple">Apple</option>
+  <option value="grapes">Grapes</option>
+  <option value="banana">Banana</option>
+</select>
+<br/>  <br/>
+I live in a: <input type="radio" name="rd" value="house">House</input> 
+<input type="radio" name="rd" value="flat">Flat</input>
+<input type="radio" name="rd" value="bedsit">Bedsit</input>
+<input type="radio" name="rd" value="caravan">Caravan</input>
+<br/><br/>
+My upload file is <input type="button" value="Chose file"></input> no file selected
+<br/>
+</div>
+</form>
+</fieldset>
+
+<br/>
+<fieldset>
+<legend> leaving!</legend>
+<form class="basic-grey">
+<div class="cntr">
+You can leave a message for me here: <br/>
+<textarea rows="4" cols="50" id="ta">
+</textarea> 
+<br/>
+<input type="button" value="GO"> </input>
+<input type="button" value="START AGAIN" onClick="erase();"> </input>
+<div>
+</form>
+</fieldset>
+</body>
+<script>
+function erase()
+{
+ document.getElementById("ta").value="";
+
+}
+</script>
+</html>

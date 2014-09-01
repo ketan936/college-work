@@ -6,7 +6,7 @@
 	<title>Regeistration Form</title>
 
 	<body>
-		<form action="index_submit" method="get" accept-charset="utf-8" class="basic-grey">
+		<form action="index_submit" name="reg_form" onsubmit="return validateForm()" method="get" accept-charset="utf-8" class="basic-grey">
 			<h1 id="test">Registration Form <span>please fill the below form</span></h1>
 			<p>
 				<label for="user">User Id</label>
@@ -22,7 +22,7 @@
 			</p>
 			<p>
 				<label for="address">Address</label>
-				<input type="text" name="address" value="" id="address"/>
+				<textarea name="address" rows="8" cols="40"></textarea>
 			</p>
 			<p>
 				<label for="zipcode">Zipcode</label>
@@ -46,7 +46,7 @@
 			</p>
 			<p>
 				<label for="email">Email</label>
-				<input type="email" name="email" value="" id="email"/>
+				<input type="text" name="email" value="" id="email"/>
 			</p>
 
 			<p>
