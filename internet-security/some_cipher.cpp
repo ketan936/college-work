@@ -1,7 +1,13 @@
 #include <iostream>
 #include <stack>
 #include <string>
+#include <fstream>
 using namespace std;
+char var_char_array[10000], var_char_array_encrypted[10000], *pointer_char;
+ifstream var_read;
+ofstream var_write;
+char var_char_read;
+int var_int_case, var_int_loop_i;
 
 stack<int> create_stack(int level) {
 	stack<int> my_stack;
@@ -21,6 +27,38 @@ string reverse(string s) {
 
 	return result;
 }
+int readdata() // read data from file
+{
+	var_read.open("input.txt");
+	var_int_loop_i = 0;
+	if (var_read.eof()) {
+		return 0;
+	}
+	while (!var_read.eof()) {
+		var_read >> var_char_read;
+		if (var_char_read >= 'A' && var_char_read <= 'Z') {
+			var_char_read += 32;
+		}
+		if (var_char_read >= 'a' && var_char_read <= 'z') {
+			var_char_array[var_int_loop_i] = var_char_read;
+			var_int_loop_i++;
+		}
+	}
+	var_char_array[var_int_loop_i - 1] = '\0';
+	var_read.close();
+	return var_int_loop_i;
+}
+
+int writedata(string ptr) // read data from file
+		{
+	var_write.open("output.txt");
+
+	var_write << ptr;
+
+	var_write.close();
+	return 1;
+}
+
 string add_x(string s , int pos){
 	cout << "this is the string before"<<s<<endl;
 	for (int i = pos+1; i <= s.length(); ++i) {
@@ -46,7 +84,8 @@ int main() {
 	int n;
 
 	cout << "Enter a string: ";
-	cin >> cipher;
+	readdata();
+	cipher=var_char_array;
 	cout << cipher << endl;
 
 	cout << "Enter a level of cipher: ";
@@ -84,8 +123,11 @@ int main() {
 	}
 	encrypted = remove_x(encrypted, ' ');
 	cout << "encrypted string is: " << encrypted << endl;
-	for (int i = 3; i == 3; i++) {
-		cout << "Checking for level: " << i << endl;
+	writedata(encrypted);
+
+		cout << "Enter level: " << endl;
+		int i;
+		cin >> i;
 		string other_parts[i];
 		int length_of_top = ((encrypted.length()) / (2 * (i - 1))) + 1;
 		other_parts[i - 1] = encrypted.substr(
@@ -117,7 +159,7 @@ int main() {
 					result+=temp;
 		}
 		cout << "deciphered string is: " << remove_x(result, 'x') << endl;
-	}
+
 
 }
 
