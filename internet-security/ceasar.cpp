@@ -1,300 +1,187 @@
+#include <cstdlib>
 #include <iostream>
-#include <cstdio>
+#include <fstream>
 #include <cstring>
-#include <algorithm>
-#define MAXLEN 1000
-#define MOD 26
 
 using namespace std;
 
-char data[MAXLEN];
+int var_int_case,var_int_loop_i;
+char var_char_array[10000],var_char_array_encrypted[10000],*pointer_char;
+ifstream var_read;
+char var_char_read;
 
-int key;
-
-void encrypt_data()
+int readdata() // read data from file
 {
-    FILE *f = fopen("in_0.txt","r");
-    FILE *fo = fopen("out_0.txt","w");
-    int i;
-    //printf("Enter Key value : ");
-    //scanf("%d",&key);
-    fscanf(f, "%d", &key);
-    while(key<0)
-    {
-        key += MOD;
-    }
-    key %= MOD;
-    //printf("Enter Data to encrypt : ");
-    while(fscanf(f, "%s", data) != EOF)
-    {
-        char encrypted_data[MAXLEN];
-        //printf(" %s\n",data);
-        for(i=0; data[i] != '\0'; i++)
-        {
-            if(data[i] >= 'a' && data[i] <= 'z')
-            {
-                char temp = data[i];
-                temp -= 'a';
-                temp += key;
-                //temp += 26;
-                temp %= MOD;
-                temp += 'a';
-                encrypted_data[i] = temp;
-            }
-            else if(data[i] >= 'A' && data[i] <= 'Z')
-            {
-                char temp = data[i];
-                temp -= 'A';
-                temp += key;
-                //temp += 26;
-                temp %= MOD;
-                temp += 'A';
-                encrypted_data[i] = temp;
-            }
-            else
-            {
-                encrypted_data[i] = data[i];
-            }
-        }
-        encrypted_data[i] = '\0';
-        fprintf(fo,"%s\n",encrypted_data);
-    }
-    fclose(f);
-    fclose(fo);
+	var_read.open("input.txt");
+	var_int_loop_i=0;
+	if(var_read.eof())
+	{
+	return 0;
+	}
+	while(!var_read.eof())
+	{
+	var_read>>var_char_read;
+	if(var_char_read>='A' && var_char_read<='Z')
+	{
+	var_char_read+=32;
+	}
+	if(var_char_read>='a' && var_char_read<='z')
+	{
+	var_char_array[var_int_loop_i]=var_char_read;
+	var_int_loop_i++;
+	}
+	}
+	var_char_array[var_int_loop_i-1]='\0';
+	var_read.close();
+	return var_int_loop_i;
 }
 
-void decrypt_data(int key)
+int encrypt(char *ptr,int key) // Encrypt data with key which is passed as argument
 {
-    FILE *f = fopen("out_0.txt","r");
-    int i,k;
-    char all_data[MAXLEN][MAXLEN];
-    int j = 0;
-    while(fscanf(f, "%s", data) != EOF)
-    {
-        strcpy(all_data[j], data);
-        //printf("%s\n",all_data[j]);
-        j++;
-    }
-    for(k=0;k<j;k++)
-    {
-        strcpy(data,all_data[k]);
-        char encrypted_data[MAXLEN];
-        for(i=0; data[i] != '\0'; i++)
-        {
-            if(data[i] >= 'a' && data[i] <= 'z')
-            {
-                char temp = data[i];
-                temp -= 'a';
-                temp -= key;
-                temp += 26;
-                temp %= MOD;
-                temp += 'a';
-               // temp %= MOD;
-                encrypted_data[i] = temp;
-            }
-            else if(data[i] >= 'A' && data[i] <= 'Z')
-            {
-                char temp = data[i];
-                temp -= 'A';
-                temp -= key;
-                temp += 26;
-                temp %= MOD;
-                temp += 'A';
-                //temp %= MOD;
-                encrypted_data[i] = temp;
-            }
-            else
-            {
-                encrypted_data[i] = data[i];
-            }
-        }
-        encrypted_data[i] = '\0';
-        printf("%s\n",encrypted_data);
-    }
+	int var_int_temp,var_temp_length=strlen(var_char_array);
+	for(var_int_temp=0;var_int_temp<var_temp_length;var_int_temp++)
+	{
+	if(var_char_array[var_int_temp]+key>'z')
+	{
+	*ptr=var_char_array[var_int_temp]-26+key;
+	}
+	else
+	{
+	*ptr=var_char_array[var_int_temp]+key;
+	}
+	ptr++;
+	}
+	*ptr='\0';
+	return 0;
 }
 
-void brute_force_hack()
+int decrypt(char *ptr,int key)  // Decrypt data with key which is passed as argument and ask for user to verify it
 {
-    FILE *f = fopen("out_0.txt","r");
-    int i,key,k;
-    char all_data[MAXLEN][MAXLEN];
-    int j = 0;
-    while(fscanf(f, "%s", data) != EOF)
-    {
-        strcpy(all_data[j], data);
-        j++;
-    }
-    //printf("Enter Key value : ");
-    for(key=0;key<26;key++)
-    {
-        for(k=0;k<j;k++)
-        {
-            strcpy(data,all_data[k]);
-            char encrypted_data[MAXLEN];
-            for(i=0; data[i] != '\0'; i++)
-            {
-                if(data[i] >= 'a' && data[i] <= 'z')
-                {
-                    char temp = data[i];
-                    temp -= 'a';
-                    temp -= key;
-                    temp += 26;
-                    temp %= MOD;
-                    temp += 'a';
-                    encrypted_data[i] = temp;
-                }
-                else if(data[i] >= 'A' && data[i] <= 'Z')
-                {
-                    char temp = data[i];
-                    temp -= 'A';
-                    temp -= key;
-                    temp += 26;
-                    temp %= MOD;
-                    temp += 'A';
-                    encrypted_data[i] = temp;
-                }
-                else
-                {
-                    encrypted_data[i] = data[i];
-                }
-            }
-            encrypted_data[i] = '\0';
-            printf("%s\n",encrypted_data);
-        }
-        printf("Is it readable? (y/n)");
-        char ch;
-        scanf(" %c",&ch);
-        if(ch == 'y' || ch == 'Y')
-        {
-            printf("Cracked!\n");
-            printf("Key is %d\n",key);
-            break;
-        }
-        else
-        {
-            continue;
-        }
-    }
+	char *char_pointer_temp=ptr,var_char_temp;
+	int var_int_temp,var_temp_length=strlen(ptr);
+	for(var_int_temp=0;var_int_temp<var_temp_length;var_int_temp++)
+	{
+	if(var_char_array_encrypted[var_int_temp]-key<'a')
+	{
+	cout<<(char)(var_char_array_encrypted[var_int_temp]+26-key);
+	}
+	else
+	{
+	cout<<(char)(var_char_array_encrypted[var_int_temp]-key);
+	}
+	}
+	cout<<endl;
+	getchar();
+	cout<<"Is It Meaningful ? (y/n) : \n\n";
+	cin>>var_char_temp;
+	if(var_char_temp=='y' || var_char_temp=='Y')
+	{
+	cout<<"Cipher Is Decrypted "<<endl;
+	cout<<"Decryption Key (Particular Solution) = "<<key<<endl;
+	return 1;
+	}
+	return 0;
 }
 
-void frequency_hack()
+void occurence(int *p,char *c)  // Calculate occurence to use frequency method of decryption
 {
-    char goku[26] = {'e','t','a','o','i','n','s','h','r','d','l','u','c','m','w','f','y','g','p','b','v','k','x','j','q','z','\0'};
-    int freq_cnt[26] = {0};
-    FILE *f = fopen("out_0.txt","r");
-    int i,key,k;
-    char all_data[MAXLEN][MAXLEN];
-    int j = 0;
-    while(fscanf(f, "%s", data) != EOF)
-    {
-        int data_len = strlen(data);
-        for(i=0;i<data_len;i++)
-        {
-            if(data[i] >= 'A' && data[i] <= 'Z')
-            {
-                data[i] += 32;
-            }
-            freq_cnt[data[i]-'a']++;
-        }
-        strcpy(all_data[j], data);
-        j++;
-    }
-    int key_max = 0;
-    int idx = 0;
-    for(i=0;i<26;i++)
-    {
-        if(freq_cnt[i] > key_max)
-        {
-            key_max = freq_cnt[i];
-            idx = i;
-        }
-    }
-    for(int u = 0; goku[u] != '\0';u++)
-    {
-        key = idx - (goku[u] - 'a');
-        key += MOD;
-        key %= MOD;
-        printf("key is : %d\n",key);
-        for(k=0;k<j;k++)
-        {
-            strcpy(data,all_data[k]);
-            char encrypted_data[MAXLEN];
-            for(i=0; data[i] != '\0'; i++)
-            {
-                if(data[i] >= 'a' && data[i] <= 'z')
-                {
-                    char temp = data[i];
-                    temp -= 'a';
-                    temp -= key;
-                    temp += 26;
-                    temp %= MOD;
-                    temp += 'a';
-                   // temp %= MOD;
-                    encrypted_data[i] = temp;
-                }
-                else if(data[i] >= 'A' && data[i] <= 'Z')
-                {
-                    char temp = data[i];
-                    temp -= 'A';
-                    temp -= key;
-                    temp += 26;
-                    temp %= MOD;
-                    temp += 'A';
-                    //temp %= MOD;
-                    encrypted_data[i] = temp;
-                }
-                else
-                {
-                    encrypted_data[i] = data[i];
-                }
-            }
-            encrypted_data[i] = '\0';
-            printf("%s\n",encrypted_data);
-        }
-        printf("Is it readable? (y/n)");
-        char ch;
-        scanf(" %c",&ch);
-        if(ch == 'y' || ch == 'Y')
-        {
-            printf("Cracked!\n");
-            printf("Key is %d\n",key);
-            break;
-        }
-        else
-        {
-            continue;
-        }
-    }
+	while(*c!='\0')
+	{
+	*(p+*c-97)=*(p+*c-97)+1;
+	c++;
+	}
+
+	// Debugging
+
+	/*cout<<endl;
+	for(int i=0;i<26;i++)
+	{
+	cout<<*(p+i)<<" "<<char(i+97)<<endl;;
+	}
+	cout<<endl;*/
+
+	return ;
+}
+
+int maximum(int *p) // find index of maximum number from array and make it zero
+{
+	int var_int_temp_i,var_int_temp_index=0,var_int_temp_value=0;
+	for(var_int_temp_i=0;var_int_temp_i<26;var_int_temp_i++)
+	{
+		if(*(p+var_int_temp_i)>var_int_temp_value)
+		{
+			var_int_temp_index=var_int_temp_i;
+			var_int_temp_value=*(p+var_int_temp_i);
+		}
+	}
+	*(p+var_int_temp_index)=0;
+	return var_int_temp_index-97;
 }
 
 int main()
 {
-    while(1)
-    {
-        printf("[1] Encrypt Data\n[2] Decrypt Data\n[3] Hack Cipher\n[4] Frequency Hack\n[5] Exit\n");
-        int choice;
-        scanf(" %d",&choice);
-        switch(choice)
-        {
-            case 1:
-                encrypt_data();
-            break;
-            case 2:
-                int k;
-                printf("Enter Key: ");
-                scanf(" %d",&k);
-                decrypt_data(k);
-            break;
-            case 3:
-                brute_force_hack();
-            break;
-            case 4:
-                frequency_hack();
-            break;
-            case 5:
-                return 0;
-            break;
-        }
-    }
-    return 0;
+	int var_int_local_i,var_int_local_key;
+	while(true)
+	{
+	cout<<"\n1.Encrypt. \n2.Decrypt.\n3.Frequency Method For Decryption.\n4.Exit.\n"<<endl;
+	cin>>var_int_case;
+	if(readdata()==0)
+	{
+		cout<<"No Data To Read\nExiting ... \n";
+		return -1;
+	}
+	switch(var_int_case)
+	{
+	case 1:
+	{
+	cout<<"Enter Encryption Key : ";
+	cin>>var_int_local_key;
+	var_int_local_key%=26;
+	pointer_char=var_char_array_encrypted;
+	if(encrypt(var_char_array_encrypted,var_int_local_key)==0)
+	{
+	cout<<"Encrypted : "<<endl;
+	cout<<var_char_array_encrypted<<endl;
+	}
+	break;
+	}
+	case 2:
+	{
+	for(var_int_local_i=0;var_int_local_i<26;var_int_local_i++)
+	{
+	if(decrypt(var_char_array_encrypted,var_int_local_i)==1)
+	{
+	break;
+	}
+	}
+	break;
+	}
+	case 3:
+	{
+	int int_array_original[26]={0},int_array_encrypted[26]={0};
+	occurence(int_array_original,var_char_array);
+	occurence(int_array_encrypted,var_char_array_encrypted);
+	for(var_int_local_i=0;var_int_local_i<26;var_int_local_i++)
+	{
+		if(decrypt(var_char_array_encrypted,abs(maximum(int_array_original)-maximum(int_array_encrypted)))==1)
+		{
+		break;
+		}
+	}
+	break;
+	}
+	case 4:
+	{
+	return 0;
+	break;
+	}
+	default:
+	{
+		cout<<"Please Follow The Instructions !!"<<endl;
+		break;
+	}
+	}
+	}
+	system("pause");
+	return 0;
 }

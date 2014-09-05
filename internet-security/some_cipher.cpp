@@ -21,6 +21,17 @@ string reverse(string s) {
 
 	return result;
 }
+string add_x(string s , int pos){
+	cout << "this is the string before"<<s<<endl;
+	for (int i = pos+1; i <= s.length(); ++i) {
+		s.insert(i,"x");
+		cout<<"hi: "<<s;
+		i++;
+	}
+	cout << "this is the string"<<s<<endl;
+	return s;
+
+}
 string remove_x(string str, char x) {
 	string output;
 	for (size_t i = 0; i < str.size(); ++i)
@@ -76,10 +87,12 @@ int main() {
 	for (int i = 3; i == 3; i++) {
 		cout << "Checking for level: " << i << endl;
 		string other_parts[i];
-		int length_of_top = encrypted.length() / i;
+		int length_of_top = ((encrypted.length()) / (2 * (i - 1))) + 1;
 		other_parts[i - 1] = encrypted.substr(
-				encrypted.length() - length_of_top - 1, length_of_top - 1);
+				encrypted.length() - length_of_top + 1, length_of_top - 1);
 		other_parts[0] = encrypted.substr(0, length_of_top);
+		other_parts[0]= add_x(other_parts[0],1 );
+		other_parts[i-1]= add_x(other_parts[i-1],0 );
 
 		int lenght_of_rest = (length_of_top * 2) - 2;
 		for (int it = 1; it < i - 1; ++it) {
@@ -93,13 +106,17 @@ int main() {
 			cout << other_parts[k] << endl;
 		}
 		string result;
-		for (int k = 0; k < i; ++k) {
-		string temp = other_parts[k];
-		if (k%2!=0)
-			temp=reverse(temp);
-		result+=temp;
+		for (int it = 0; it < (length_of_top - 1) * 2; ++it) {
+			string temp;
+			for (int k = 0; k < i; ++k) {
+				temp += other_parts[k][it];
+
+			}
+			if (it%2!=0)
+						temp=reverse(temp);
+					result+=temp;
 		}
-		cout<<"unencrypted string is: "<<remove_x(result,'x')<<endl;
+		cout << "deciphered string is: " << remove_x(result, 'x') << endl;
 	}
 
 }

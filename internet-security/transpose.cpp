@@ -18,16 +18,16 @@ void encrypt()
 	printf("Enter Message: ");
 	scanf(" %[^\n]",msg);
 	printf("Enter Key: ");
-	japan:
+	encrypt_function:
 	scanf(" %[^\n]",key);  //key len cannot be 1
-	int key_len = strlen(key);
-	if(key_len <= 1)
+	int key_length = strlen(key);
+	if(key_length <= 1)
 	{
 		printf("Key Length should be > 1. Enter Key again: ");
-		goto japan;
+		goto encrypt_function;
 	}
 	vector < pair<char,int> > mykey;
-	for(i=0;i<key_len;i++)
+	for(i=0;i<key_length;i++)
 	{
 		mykey.push_back(make_pair(key[i],i));
 	}
@@ -59,28 +59,28 @@ void encrypt()
         }
     }
     data[j] = '\0';
-    int data_len = strlen(data);
+    int data_length = strlen(data);
     printf("%s\n",data);
 
-    int upto = data_len%key_len;
+    int upto = data_length%key_length;
     if(upto != 0)
 	{
-		upto = key_len - upto;
+		upto = key_length - upto;
 	}
-    i = data_len;
+    i = data_length;
     for(j=0;j<upto;j++)
     {
     	data[i] = 'x';
     	i++;
     }
     data[i] = '\0';
-    data_len = strlen(data);
+    data_length = strlen(data);
     printf("%s\n",data);
     int z = 0;
     for(i=0;i<mykey.size();i++)
     {
     	j = mykey[i].second;
-    	for(int k=j;k<data_len;k+=key_len)
+    	for(int k=j;k<data_length;k+=key_length)
     	{
     		cipher[z] = data[k];
     		z++;
@@ -94,26 +94,26 @@ void decrypt()
 {
 	int i,j;
 	printf("Enter Key to Decrypt: ");
-	south_korea:
+	decrypt_function:
 	scanf(" %[^\n]",key);  //key len cannot be 1
-	int key_len = strlen(key);
-	if(key_len <= 1)
+	int key_length = strlen(key);
+	if(key_length <= 1)
 	{
 		printf("Key Length should be > 1. Enter Key again: ");
-		goto south_korea;
+		goto decrypt_function;
 	}
 	vector < pair<char,int> > mykey;
-	for(i=0;i<key_len;i++)
+	for(i=0;i<key_length;i++)
 	{
 		mykey.push_back(make_pair(key[i],i));
 	}
 	sort(mykey.begin(),mykey.end());
 	int z = 0;
-	int data_len = strlen(cipher);
+	int data_length = strlen(cipher);
     for(i=0;i<mykey.size();i++)
     {
     	j = mykey[i].second;
-    	for(int k=j;k<data_len;k+=key_len)
+    	for(int k=j;k<data_length;k+=key_length)
     	{
     		decipher[k] = cipher[z];
     		z++;
