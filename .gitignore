@@ -3,3 +3,6 @@ a.out
 .project/*
 .cproject
 .cproject/*
+.settings
+.settings/*
+.classpath
