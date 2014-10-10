@@ -8,6 +8,9 @@ ifstream var_read;
 ofstream var_write;
 char var_char_read;
 int var_int_case, var_int_loop_i;
+string cipher;
+char encrypted1[1000];
+int n;
 
 stack<int> create_stack(int level) {
 	stack<int> my_stack;
@@ -49,6 +52,29 @@ int readdata() // read data from file
 	return var_int_loop_i;
 }
 
+string readdata_ouput() // read data from file
+{
+
+	var_read.open("output.txt");
+	var_int_loop_i = 0;
+	if (var_read.eof()) {
+		return 0;
+	}
+	while (!var_read.eof()) {
+		var_read >> var_char_read;
+		if (var_char_read >= 'A' && var_char_read <= 'Z') {
+			var_char_read += 32;
+		}
+		if (var_char_read >= 'a' && var_char_read <= 'z') {
+			encrypted1[var_int_loop_i] = var_char_read;
+			var_int_loop_i++;
+		}
+	}
+	encrypted1[var_int_loop_i - 1] = '\0';
+	var_read.close();
+	return encrypted1;
+}
+
 int writedata(string ptr) // read data from file
 		{
 	var_write.open("output.txt");
@@ -59,14 +85,11 @@ int writedata(string ptr) // read data from file
 	return 1;
 }
 
-string add_x(string s , int pos){
-	cout << "this is the string before"<<s<<endl;
-	for (int i = pos+1; i <= s.length(); ++i) {
-		s.insert(i,"x");
-		cout<<"hi: "<<s;
+string add_x(string s, int pos) {
+	for (int i = pos + 1; i <= s.length(); ++i) {
+		s.insert(i, "x");
 		i++;
 	}
-	cout << "this is the string"<<s<<endl;
 	return s;
 
 }
@@ -78,88 +101,112 @@ string remove_x(string str, char x) {
 	return output;
 }
 
-int main() {
-
-	string cipher;
-	int n;
-
+void encrypt() {
 	cout << "Enter a string: ";
-	readdata();
-	cipher=var_char_array;
-	cout << cipher << endl;
+		readdata();
+		cipher = var_char_array;
+		cout << cipher << endl;
 
-	cout << "Enter a level of cipher: ";
-	cin >> n;
+		cout << "Enter a level of cipher: ";
+		cin >> n;
 
-	string parts[n];
-	stack<int> my_stack;
-	for (int i = 0; i < cipher.length(); i++) {
-		if (my_stack.empty())
-			my_stack = create_stack(n);
-		cout << "my stack: " << my_stack.top() << endl;
+		string parts[n];
+		stack<int> my_stack;
+		for (int i = 0; i < cipher.length(); i++) {
+			if (my_stack.empty())
+				my_stack = create_stack(n);
+			cout << "my stack: " << my_stack.top() << endl;
+			for (int j = 0; j < n; j++)
+				parts[j] += ' ';
+			parts[my_stack.top()][parts[0].length() - 1] = cipher[i];
+			my_stack.pop();
+		}
+		while (!my_stack.empty()) {
+			for (int j = 0; j < n; j++)
+				parts[j] += ' ';
+			parts[my_stack.top()][parts[0].length() - 1] = 'x';
+			my_stack.pop();
+		}
 		for (int j = 0; j < n; j++)
 			parts[j] += ' ';
-		parts[my_stack.top()][parts[0].length() - 1] = cipher[i];
-		my_stack.pop();
-	}
-	while (!my_stack.empty()) {
-		for (int j = 0; j < n; j++)
-			parts[j] += ' ';
-		parts[my_stack.top()][parts[0].length() - 1] = 'x';
-		my_stack.pop();
-	}
-	for (int j = 0; j < n; j++)
-		parts[j] += ' ';
-	parts[0][parts[0].length() - 1] = 'x';
+		parts[0][parts[0].length() - 1] = 'x';
 
-	cout << "parts are: " << endl;
-	for (int i = 0; i < n; ++i) {
-		cout << parts[i] << endl;
-	}
-
-	string encrypted;
-	for (string s : parts) {
-		encrypted += s;
-	}
-	encrypted = remove_x(encrypted, ' ');
-	cout << "encrypted string is: " << encrypted << endl;
-	writedata(encrypted);
-
-		cout << "Enter level: " << endl;
-		int i;
-		cin >> i;
-		string other_parts[i];
-		int length_of_top = ((encrypted.length()) / (2 * (i - 1))) + 1;
-		other_parts[i - 1] = encrypted.substr(
-				encrypted.length() - length_of_top + 1, length_of_top - 1);
-		other_parts[0] = encrypted.substr(0, length_of_top);
-		other_parts[0]= add_x(other_parts[0],1 );
-		other_parts[i-1]= add_x(other_parts[i-1],0 );
-
-		int lenght_of_rest = (length_of_top * 2) - 2;
-		for (int it = 1; it < i - 1; ++it) {
-			other_parts[it] = encrypted.substr(
-					length_of_top + (lenght_of_rest * (it - 1)),
-					lenght_of_rest);
+		cout << "parts are: " << endl;
+		for (int i = 0; i < n; ++i) {
+			cout << parts[i] << endl;
 		}
 
-		cout << "other_parts are: " << endl;
+		string encrypted;
+		/*for (string s : parts) {
+		 encrypted += s;
+		 }*/
+		for (int i = 0; i < n; ++i) {
+			encrypted += parts[i];
+		}
+		encrypted = remove_x(encrypted, ' ');
+		cout << "encrypted string is: " << encrypted << endl;
+		writedata(encrypted);
+
+}
+
+void decrypt() {
+
+	string encrypted = readdata_ouput();
+	cout << encrypted << endl;
+	cout << "Enter level: " << endl;
+	int i;
+	cin >> i;
+	string other_parts[i];
+	int length_of_top = ((encrypted.length()) / (2 * (i - 1))) + 1;
+	other_parts[i - 1] = encrypted.substr(
+			encrypted.length() - length_of_top + 1, length_of_top - 1);
+	other_parts[0] = encrypted.substr(0, length_of_top);
+	other_parts[0] = add_x(other_parts[0], 1);
+	other_parts[i - 1] = add_x(other_parts[i - 1], 0);
+
+	int lenght_of_rest = (length_of_top * 2) - 2;
+	for (int it = 1; it < i - 1; ++it) {
+		other_parts[it] = encrypted.substr(
+				length_of_top + (lenght_of_rest * (it - 1)), lenght_of_rest);
+	}
+
+	cout << "other_parts are: " << endl;
+	for (int k = 0; k < i; ++k) {
+		cout << other_parts[k] << endl;
+	}
+	string result;
+	for (int it = 0; it < (length_of_top - 1) * 2; ++it) {
+		string temp;
 		for (int k = 0; k < i; ++k) {
-			cout << other_parts[k] << endl;
+			temp += other_parts[k][it];
+
 		}
-		string result;
-		for (int it = 0; it < (length_of_top - 1) * 2; ++it) {
-			string temp;
-			for (int k = 0; k < i; ++k) {
-				temp += other_parts[k][it];
+		if (it % 2 != 0)
+			temp = reverse(temp);
+		result += temp;
+	}
+	cout << "deciphered string is: " << remove_x(result, 'x') << endl;
 
-			}
-			if (it%2!=0)
-						temp=reverse(temp);
-					result+=temp;
+}
+
+int main() {
+	while (1) {
+		int choice;
+		printf("[0] Encrypt\n[1] Decrypt\n");
+		printf("Enter Choice: ");
+		scanf(" %d", &choice);
+		switch (choice) {
+		case 0:
+			encrypt();
+			break;
+		case 1:
+			decrypt();
+			break;
+		case 3:
+			return 0;
+			break;
 		}
-		cout << "deciphered string is: " << remove_x(result, 'x') << endl;
-
-
+	}
+	return 0;
 }
 

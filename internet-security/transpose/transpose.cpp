@@ -38,6 +38,28 @@ int readdata() // read data from file
 	return var_int_loop_i;
 }
 
+int readdata_ouput() // read data from file
+{
+	var_read.open("output.txt");
+	var_int_loop_i = 0;
+	if (var_read.eof()) {
+		return 0;
+	}
+	while (!var_read.eof()) {
+		var_read >> var_char_read;
+		if (var_char_read >= 'A' && var_char_read <= 'Z') {
+			var_char_read += 32;
+		}
+		if (var_char_read >= 'a' && var_char_read <= 'z') {
+			cipher[var_int_loop_i] = var_char_read;
+			var_int_loop_i++;
+		}
+	}
+	cipher[var_int_loop_i - 1] = '\0';
+	var_read.close();
+	return var_int_loop_i;
+}
+
 int writedata(char *ptr) // read data from file
 		{
 	var_write.open("output.txt");
@@ -114,6 +136,8 @@ void encrypt() {
 
 void decrypt() {
 	int i, j;
+	readdata_ouput();
+	printf("Encrpyted text: %s\n",cipher);
 	printf("Enter Key to Decrypt: ");
 	decrypt_function: scanf(" %[^\n]", key);  //key len cannot be 1
 	int key_length = strlen(key);
