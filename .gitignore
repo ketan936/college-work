@@ -6,3 +6,6 @@ a.out
 .settings
 .settings/*
 .classpath
+bin
+bin/*
+
