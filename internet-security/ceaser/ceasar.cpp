@@ -34,6 +34,28 @@ int readdata() // read data from file
 	return var_int_loop_i;
 }
 
+int readdata_ouput() // read data from file
+{
+	var_read.open("output.txt");
+	var_int_loop_i = 0;
+	if (var_read.eof()) {
+		return 0;
+	}
+	while (!var_read.eof()) {
+		var_read >> var_char_read;
+		if (var_char_read >= 'A' && var_char_read <= 'Z') {
+			var_char_read += 32;
+		}
+		if (var_char_read >= 'a' && var_char_read <= 'z') {
+			var_char_array_encrypted[var_int_loop_i] = var_char_read;
+			var_int_loop_i++;
+		}
+	}
+	var_char_array_encrypted[var_int_loop_i - 1] = '\0';
+	var_read.close();
+	return var_int_loop_i;
+}
+
 int writedata(char *ptr) // read data from file
 		{
 	var_write.open("output.txt");
@@ -41,6 +63,18 @@ int writedata(char *ptr) // read data from file
 	var_write << ptr;
 
 	var_write.close();
+	return 1;
+}
+
+int writedata_all(string ptr) // read data from file
+		{
+
+	var_write.open("result.txt", std::ios_base::app);
+	var_write << ptr;
+	var_write << endl;
+	var_write.close();
+
+
 	return 1;
 }
 int encrypt(char *ptr, int key) // Encrypt data with key which is passed as argument
@@ -78,6 +112,28 @@ int decrypt(char *ptr, int key) // Decrypt data with key which is passed as argu
 		cout << "Decryption Key (Particular Solution) = " << key << endl;
 		return 1;
 	}
+	return 0;
+}
+
+int decrypt_all(char *ptr, int key) // Decrypt data with key which is passed as argument and ask for user to verify it
+		{
+	char *char_pointer_temp = ptr, var_char_temp;
+	int var_int_temp, var_temp_length = strlen(ptr);
+	string s;
+	for (var_int_temp = 0; var_int_temp < var_temp_length; var_int_temp++) {
+
+		if (var_char_array_encrypted[var_int_temp] - key < 'a') {
+			cout << (char) (var_char_array_encrypted[var_int_temp] + 26 - key);
+			s+=(char) (var_char_array_encrypted[var_int_temp] + 26 - key);;
+		} else {
+			cout << (char) (var_char_array_encrypted[var_int_temp] - key);
+			s+=(char) (var_char_array_encrypted[var_int_temp] - key);
+		}
+	}
+	cout << endl;
+	writedata_all(s);
+
+
 	return 0;
 }
 
@@ -159,8 +215,21 @@ int main() {
 			}
 			break;
 		}
-		case 4: {
+		case 5: {
 			return 0;
+			break;
+		}
+		case 4: {
+			readdata_ouput();
+
+			for (var_int_local_i = 0; var_int_local_i < 26; var_int_local_i++) {
+				if (decrypt_all(var_char_array_encrypted, var_int_local_i) == 1) {
+					break;
+				}
+
+
+			}
+
 			break;
 		}
 		default: {
