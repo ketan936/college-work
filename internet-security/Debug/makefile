@@ -8,6 +8,12 @@ RM := rm -rf
 
 # All of the sources participating in the build are defined here
 -include sources.mk
+-include vigener/subdir.mk
+-include transpose/subdir.mk
+-include railfence/subdir.mk
+-include playfair/subdir.mk
+-include crap/subdir.mk
+-include ceaser/subdir.mk
 -include subdir.mk
 -include objects.mk
 
