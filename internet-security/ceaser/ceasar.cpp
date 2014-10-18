@@ -72,6 +72,7 @@ int writedata_all(string ptr) // read data from file
 	var_write.open("result.txt", std::ios_base::app);
 	var_write << ptr;
 	var_write << endl;
+	var_write << endl;
 	var_write.close();
 
 
@@ -130,6 +131,7 @@ int decrypt_all(char *ptr, int key) // Decrypt data with key which is passed as 
 			s+=(char) (var_char_array_encrypted[var_int_temp] - key);
 		}
 	}
+	cout << endl;
 	cout << endl;
 	writedata_all(s);
 

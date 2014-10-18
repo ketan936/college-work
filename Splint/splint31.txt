@@ -1,0 +1,2 @@
+splint splint3.c +predboolptr –booltype bool
+

@@ -168,7 +168,7 @@ void decrypt() {
 	}
 	plen++;
 	decipher[plen] = '\0';
-	printf("%s\n", decipher);
+	printf("\nthis is decipher:\n %s\n", decipher);
 }
 
 int main() {
