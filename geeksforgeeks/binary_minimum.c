@@ -37,4 +37,3 @@ void insert_node (struct node* node , int data)
 
 
 
-int min
