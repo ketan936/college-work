@@ -47,30 +47,30 @@ int main (void)
 		
 		/* Check if our file descriptor has received data. */
 		if (ret > 0 && FD_ISSET(fd, &fds)) {
-			printf("\nselect() says there should be data\n");
 			
 			/* Make the call to receive the device.
 			   select() ensured that this will not block. */
 			dev = udev_monitor_receive_device(mon);
 			if (dev) {
-				printf("Got Device\n");
-				printf("   Node: %s\n", udev_device_get_devnode(dev));
-				printf("   Subsystem: %s\n", udev_device_get_subsystem(dev));
-				printf("   Devtype: %s\n", udev_device_get_devtype(dev));
-				printf("   Action: %s\n",udev_device_get_action(dev));
 				if(strcmp(udev_device_get_action(dev),"remove") != 0){
-				dev = udev_device_get_parent_with_subsystem_devtype(dev,
-		       			"usb",
-		       			"usb_device");
-				printf("  VID/PID: %s %s\n",
-		        	udev_device_get_sysattr_value(dev,"idVendor"),
-		        	udev_device_get_sysattr_value(dev, "idProduct"));
-				printf("  %s\n  %s\n",
-		        		udev_device_get_sysattr_value(dev,"manufacturer"),
-		        		udev_device_get_sysattr_value(dev,"product"));
-				printf("  serial: %s\n",
-		         		udev_device_get_sysattr_value(dev, "serial"));
-				}
+					printf("Got Device\n");
+					printf("   Node: %s\n", udev_device_get_devnode(dev));
+					printf("   Subsystem: %s\n", udev_device_get_subsystem(dev));
+					printf("   Devtype: %s\n", udev_device_get_devtype(dev));
+					printf("   Action: %s\n",udev_device_get_action(dev));
+					
+					dev = udev_device_get_parent_with_subsystem_devtype(dev,
+			       			"usb",
+			       			"usb_device");
+					printf("  VID/PID: %s %s\n",
+			        	udev_device_get_sysattr_value(dev,"idVendor"),
+			        	udev_device_get_sysattr_value(dev, "idProduct"));
+					printf("  %s\n  %s\n",
+			        		udev_device_get_sysattr_value(dev,"manufacturer"),
+			        		udev_device_get_sysattr_value(dev,"product"));
+					printf("  serial: %s\n",
+			         		udev_device_get_sysattr_value(dev, "serial"));
+					}
 				udev_device_unref(dev);
 			}
 			else {

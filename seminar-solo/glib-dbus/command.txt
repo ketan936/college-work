@@ -1,0 +1,3 @@
+dbus-send --type=method_call --print-reply --dest=com.castle.usb  /usbData com.castle.usb.getvalue2
+
+dbus-send --type=method_call  --dest=com.castle.usb  /usbData com.castle.usb.getvalue1
