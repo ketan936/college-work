@@ -1,1 +1,0 @@
-railfence.d: ../railfence.cpp

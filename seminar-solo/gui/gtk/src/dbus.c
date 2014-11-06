@@ -1,53 +1,101 @@
+#include <libudev.h>
+#include <stdio.h>
 #include <stdlib.h>
+#include <locale.h>
+#include <unistd.h>
 #include <glib.h>
 #include <glib-object.h>
 #include <dbus/dbus.h>
 #include <dbus/dbus-glib.h>
-int
-main(int argc, char **argv)
+
+int main(void)
 {
-DBusGConnection *connection;
-GError *error;
-DBusGProxy *proxy;
-char **name_list;
-char **name_list_ptr;
-g_type_init();
-error = NULL;
-connection = dbus_g_bus_get(DBUS_BUS_SESSION,
-&error);
-if (connection == NULL) {
-g_printerr("Failed to open connection to bus: %s\n",
-error->message);
-g_error_free(error);
-exit(1);
-}
-/* Create a proxy object for the "bus driver" (name "org.freedesktop.DBus") */
-proxy = dbus_g_proxy_new_for_name(connection,
-DBUS_SERVICE_DBUS,
-DBUS_PATH_DBUS,
-DBUS_INTERFACE_DBUS);
-/* Call ListNames method, wait for reply */
-error = NULL;
-if (!dbus_g_proxy_call(proxy, "ListNames", &error, G_TYPE_INVALID,
-G_TYPE_STRV, &name_list, G_TYPE_INVALID)) {
-/* Just do demonstrate remote exceptions versus regular GError */
-if (error->domain == DBUS_GERROR && error->code == DBUS_GERROR_REMOTE_EXCEPTION)
-g_printerr("Caught remote method exception %s: %s",
-dbus_g_error_get_name(error),
-error->message);
-else
-g_printerr("Error: %s\n", error->message);
-g_error_free(error);
-exit(1);
-}
-/* Print the results */
-g_print("Names on the message bus:\n");
-for (name_list_ptr = name_list; *name_list_ptr; name_list_ptr++) {
-g_print(" %s\n", *name_list_ptr);
-}
-g_strfreev(name_list);
-g_object_unref(proxy);
-return 0;
-}
+        DBusGConnection *connection;
+        GError *error;
+        DBusGProxy *proxy;
+        char **name_list;
+        char **name_list_ptr;
+        struct udev *udev;
+        struct udev_enumerate *enumerate;
+        struct udev_list_entry *devices, *dev_list_entry;
+        struct udev_device *dev;
 
+        error = NULL;
+        connection = dbus_g_bus_get(DBUS_BUS_SESSION, &error);
+        if (connection == NULL) {
+                g_printerr("Failed to open connection to bus: %s\n",
+                                error->message);
+                g_error_free(error);
+                exit(1);
+        }
 
+        /* Create the udev object */
+        udev = udev_new();
+        if (!udev) {
+                printf("Can't create udev\n");
+                exit(1);
+        }
+
+        /* Create a list of the devices in the 'hidraw' subsystem. */
+        enumerate = udev_enumerate_new(udev);
+        udev_enumerate_add_match_subsystem(enumerate, "block");
+        udev_enumerate_scan_devices(enumerate);
+        devices = udev_enumerate_get_list_entry(enumerate);
+        /* For each item enumerated, print out its information.
+         udev_list_entry_foreach is a macro which expands to
+         a loop. The loop will be executed for each member in
+         devices, setting dev_list_entry to a list entry
+         which contains the device's path in /sys. */
+        udev_list_entry_foreach(dev_list_entry, devices)
+        {
+                const char *path;
+
+                /* Get the filename of the /sys entry for the device
+                 and create a udev_device object (dev) representing it */
+                path = udev_list_entry_get_name(dev_list_entry);
+                dev = udev_device_new_from_syspath(udev, path);
+
+                /* usb_device_get_devnode() returns the path to the device node
+                 itself in /dev. */
+                printf("   Node: %s\n", udev_device_get_devnode(dev));
+                printf("   Subsystem: %s\n", udev_device_get_subsystem(dev));
+                printf("   Devtype: %s\n", udev_device_get_devtype(dev));
+                /* The device pointed to by dev contains information about
+                 the hidraw device. In order to get information about the
+                 USB device, get the parent device with the
+                 subsystem/devtype pair of "usb"/"usb_device". This will
+                 be several levels up the tree, but the function will find
+                 it.*/
+                dev = udev_device_get_parent_with_subsystem_devtype(dev, "usb",
+                                "usb_device");
+                if (!dev) {
+                        printf("Unable to find parent usb device.");
+                        exit(1);
+                }
+
+                /* From here, we can call get_sysattr_value() for each file
+                 in the device's /sys entry. The strings passed into these
+                 functions (idProduct, idVendor, serial, etc.) correspond
+                 directly to the files in the directory which represents
+                 the USB device. Note that USB strings are Unicode, UCS2
+                 encoded, but the strings returned from
+                 udev_device_get_sysattr_value() are UTF-8 encoded. */
+                printf("  VID/PID: %s %s\n",
+                                udev_device_get_sysattr_value(dev, "idVendor"),
+                                udev_device_get_sysattr_value(dev,
+                                                "idProduct"));
+                printf("  %s\n  %s\n",
+                                udev_device_get_sysattr_value(dev,
+                                                "manufacturer"),
+                                udev_device_get_sysattr_value(dev, "product"));
+                printf("  serial: %s\n",
+                                udev_device_get_sysattr_value(dev, "serial"));
+                udev_device_unref(dev);
+        }
+        /* Free the enumerator object */
+        udev_enumerate_unref(enumerate);
+
+        udev_unref(udev);
+
+        return 0;
+}
