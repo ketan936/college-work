@@ -81,4 +81,6 @@ int main (void)
 		printf(".");
 		fflush(stdout);
 	}
+	udev_monitor_unref (mon);
+	udev_unref(udev);
 }

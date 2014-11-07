@@ -35,6 +35,7 @@
 #include <locale.h>
 #include <libudev.h>
 
+
 /* Pull symbolic constants that are shared (in this example) between
    the client and the server. */
 #include "common-defs.h"
@@ -66,6 +67,7 @@ typedef struct {
   gchar* value2;
 } ValueObject;
 
+
 typedef struct {
   /* The parent class state. */
   GObjectClass parent;
@@ -79,16 +81,19 @@ typedef struct {
   guint signals[E_SIGNAL_COUNT];
 } ValueObjectClass;
 
+
+typedef struct {
+  /* e parent class object state. */
+  ValueObject* valueObj;
+  struct udev_monitor* mon;
+
+} CallbackObject;
 /* Forward declaration of the function that will return the GType of
    the Value implementation. Not used in this program. */
 GType value_object_get_type(void);
 
 
-struct udev *udev;
-  struct udev_enumerate *enumerate;
-  struct udev_list_entry *devices, *dev_list_entry;
-  struct udev_device *dev;
-  struct udev_device *parent_dev;
+
   
   /* Create the udev object */
   
@@ -359,6 +364,12 @@ static gboolean value_object_thresholdsOk(ValueObject* obj,
 gboolean value_object_getvalue1(ValueObject* obj, gchar*** valueOut,
                                                   GError** error) {
 
+  struct udev *udev;
+  struct udev_enumerate *enumerate;
+  struct udev_list_entry *devices, *dev_list_entry;
+  struct udev_device *dev;
+  struct udev_device *parent_dev;
+
   dbg("Called (internal value1 is %s)", obj->value1[0]);
 
   g_assert(obj != NULL);
@@ -430,7 +441,7 @@ udev = udev_new();
    
    
   
-   value_object_emitSignal(obj, E_SIGNAL_CHANGED_VALUE1, "usb_list_called");
+ 
 
 
   s[kk]=NULL;
@@ -479,6 +490,73 @@ static void handleError(const char* msg, const char* reason,
   }
 }
 
+
+
+static gboolean timerCallback( CallbackObject* callbackObj) { 
+  struct udev_monitor* mon = callbackObj->mon;
+  ValueObject* obj = callbackObj->valueObj;
+  struct udev_device *dev;
+   int fd;
+  /* Get the file descriptor (fd) for the monitor.
+     This fd will get passed to select() */
+  fd = udev_monitor_get_fd(mon);
+
+
+
+fd_set fds;
+struct timeval tv;
+int ret;
+
+FD_ZERO(&fds);
+    FD_SET(fd, &fds);
+    tv.tv_sec = 0;
+    tv.tv_usec = 0;
+    
+    ret = select(fd+1, &fds, NULL, NULL, &tv);
+   
+ 
+  if (ret > 0 && FD_ISSET(fd, &fds)) {
+    
+    /* Make the call to receive the device.
+       select() ensured that this will not block. */
+    dev = udev_monitor_receive_device(mon);
+    if (dev) {
+      if(g_strcmp0(udev_device_get_action(dev),"remove") != 0){
+        g_print("Got Device\n");
+        g_print("   Node: %s\n", udev_device_get_devnode(dev));
+        g_print("   Subsystem: %s\n", udev_device_get_subsystem(dev));
+        g_print("   Devtype: %s\n", udev_device_get_devtype(dev));
+        g_print("   Action: %s\n",udev_device_get_action(dev));
+        
+        dev = udev_device_get_parent_with_subsystem_devtype(dev,
+                "usb",
+                "usb_device");
+        g_print("  VID/PID: %s %s\n",
+              udev_device_get_sysattr_value(dev,"idVendor"),
+              udev_device_get_sysattr_value(dev, "idProduct"));
+        g_print("  %s\n  %s\n",
+                udev_device_get_sysattr_value(dev,"manufacturer"),
+                udev_device_get_sysattr_value(dev,"product"));
+        g_print("  serial: %s\n",
+                udev_device_get_sysattr_value(dev, "serial"));
+        value_object_emitSignal(obj, E_SIGNAL_CHANGED_VALUE1, udev_device_get_sysattr_value(dev, "serial") );
+        }
+        else if(g_strcmp0(udev_device_get_action(dev),"remove") == 0){
+              value_object_emitSignal(obj, E_SIGNAL_CHANGED_VALUE1, "usb removed");
+
+        }
+       /* value_object_emitSignal(obj, E_SIGNAL_CHANGED_VALUE1,  udev_device_get_sysattr_value(dev, "serial"));*/
+      udev_device_unref(dev);
+
+    }
+    else {
+      g_print("No Device from receive_device(). An error occured.\n");
+    }
+
+  }
+  return TRUE;
+}
+
 /**
  * The main server code
  *
@@ -511,8 +589,23 @@ int main(int argc, char** argv) {
   guint result;
   GError* error = NULL;
 
+ 
   /* Initialize the GType/GObject system. */
   g_type_init();
+
+    struct udev *udev;
+
+  udev = udev_new();
+  struct udev_monitor *mon;
+  if (!udev) {
+    dbg("Can't create udev\n");
+    exit(1);
+  }
+  
+/* Set up a monitor to monitor hidraw devices */
+  mon = udev_monitor_new_from_netlink(udev, "udev");
+  udev_monitor_filter_add_match_subsystem_devtype(mon, "block", "disk");
+  udev_monitor_enable_receiving(mon);
 
   /* Create a main loop that will dispatch callbacks. */
   mainloop = g_main_loop_new(NULL, FALSE);
@@ -664,7 +757,11 @@ int main(int argc, char** argv) {
   g_print(PROGNAME
           ": Not daemonizing (built with NO_DAEMON-build define)\n");
 #endif
+  CallbackObject* callbackObj = malloc(sizeof(CallbackObject));
+  callbackObj->valueObj = valueObj;
+  callbackObj->mon = mon;
 
+   g_timeout_add(1000, (GSourceFunc)timerCallback, callbackObj);
   /* Start service requests on the D-Bus forever. */
   g_main_loop_run(mainloop);
   /* This program will not terminate unless there is a critical
