@@ -430,6 +430,7 @@ udev = udev_new();
    
    
   
+   value_object_emitSignal(obj, E_SIGNAL_CHANGED_VALUE1, "usb_list_called");
 
 
   s[kk]=NULL;

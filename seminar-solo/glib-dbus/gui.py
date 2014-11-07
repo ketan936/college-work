@@ -1,13 +1,3 @@
-#!/usr/bin/python
-
-# ZetCode PyGTK tutorial 
-#
-# This example demonstrates the Entry widget
-#
-# author: jan bodnar
-# website: zetcode.com 
-# last edited: February 2009
-
 import gtk
 
 class PyApp(gtk.Window):
