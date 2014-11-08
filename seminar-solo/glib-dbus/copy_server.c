@@ -33,6 +33,8 @@
 #include <stdlib.h> /* exit, EXIT_FAILURE */
 #include <unistd.h> /* daemon */
 #include <locale.h>
+#include <libudev.h>
+
 
 /* Pull symbolic constants that are shared (in this example) between
    the client and the server. */
@@ -60,10 +62,11 @@ typedef struct {
   /* The parent class object state. */
   GObject parent;
   /* Our first per-object state variable. */
-  gchar* value1;
+  gchar** value1;
   /* Our second per-object state variable. */
   gchar* value2;
 } ValueObject;
+
 
 typedef struct {
   /* The parent class state. */
@@ -78,9 +81,25 @@ typedef struct {
   guint signals[E_SIGNAL_COUNT];
 } ValueObjectClass;
 
+
+typedef struct {
+  /* e parent class object state. */
+  ValueObject* valueObj;
+  struct udev_monitor* mon;
+
+} CallbackObject;
 /* Forward declaration of the function that will return the GType of
    the Value implementation. Not used in this program. */
 GType value_object_get_type(void);
+
+
+
+  
+  /* Create the udev object */
+  
+  /* Create a list of the devices in the 'hidraw' subsystem. */
+  
+
 
 /* Macro for the above. It is common to define macros using the
    naming convention (seen below) for all GType implementations,
@@ -110,7 +129,7 @@ G_DEFINE_TYPE(ValueObject, value_object, G_TYPE_OBJECT)
  * table, the functions must be declared before the stub is included.
  */
 
-gboolean value_object_getvalue1(ValueObject* obj, gchar** value_out, gchar** valueOut,
+gboolean value_object_getvalue1(ValueObject* obj, gchar*** value_out,
                                                   GError** error);
 gboolean value_object_getvalue2(ValueObject* obj, gchar** value_out,
                                                   GError** error);
@@ -141,12 +160,18 @@ gboolean value_object_getvalue2(ValueObject* obj, gchar** value_out,
 static void value_object_init(ValueObject* obj) {
   dbg("Called");
   g_assert(obj != NULL);
-  gchar* key = malloc(10 * sizeof(gchar));
-  g_stpcpy(key,"hello");
-  gchar* key2 = malloc(10 * sizeof(gchar));
-  g_stpcpy(key2,"hello1");
-  obj->value1 = key;
-  obj->value2 = key2;
+  gchar **orderIds;
+  gchar *key;
+orderIds = malloc(6 * sizeof(gchar*));
+int i;
+for(i = 0; i < 6; i++) {
+  orderIds[i] = malloc((6 + 1) * sizeof(gchar));
+  g_stpcpy(orderIds[i], "world");
+}
+ key = malloc((6 + 1) * sizeof(gchar));
+  g_stpcpy(key, "world");
+  obj->value1 = orderIds;
+  obj->value2 = key;
 }
 
 /**
@@ -336,10 +361,16 @@ static gboolean value_object_thresholdsOk(ValueObject* obj,
  * Function that gets executed on "getvalue1".
  * We don't signal the get operations, so this will be simple.
  */
-gboolean value_object_getvalue1(ValueObject* obj, gchar** valueOut,gchar** value_out,
+gboolean value_object_getvalue1(ValueObject* obj, gchar*** valueOut,
                                                   GError** error) {
 
-  dbg("Called (internal value1 is %s)", obj->value1);
+  struct udev *udev;
+  struct udev_enumerate *enumerate;
+  struct udev_list_entry *devices, *dev_list_entry;
+  struct udev_device *dev;
+  struct udev_device *parent_dev;
+
+  dbg("Called (internal value1 is %s)", obj->value1[0]);
 
   g_assert(obj != NULL);
 
@@ -352,12 +383,70 @@ gboolean value_object_getvalue1(ValueObject* obj, gchar** valueOut,gchar** value
      the error condition there. */
  
   /* Copy the current first value to caller specified memory. */
-     gchar* key = malloc(100 * sizeof(gchar));
-  g_stpcpy(key,"hello");
-  *valueOut = obj->value1;
-  *value_out = key;
-  dbg("(Internal Value %s)\n", *valueOut);
-    dbg("(another Internal Value %s)\n", *value_out);
+GStrv s = g_new(char *, 50);
+udev = udev_new();
+  if (!udev) {
+    dbg("Can't create udev\n");
+    exit(1);
+  }
+  enumerate = udev_enumerate_new(udev);
+  udev_enumerate_add_match_subsystem(enumerate, "block");
+   udev_enumerate_add_match_property    (enumerate, "DEVTYPE","disk");
+  gchar*** value_out;
+
+ udev_enumerate_scan_devices(enumerate);
+  devices = udev_enumerate_get_list_entry(enumerate);
+  int kk = 0;
+  
+   udev_list_entry_foreach(dev_list_entry, devices) {
+    const char *path;
+    
+    /* Get the filename of the /sys entry for the device
+       and create a udev_device object (dev) representing it */
+    path = udev_list_entry_get_name(dev_list_entry);
+    dev = udev_device_new_from_syspath(udev, path);
+    
+    parent_dev = udev_device_get_parent_with_subsystem_devtype(
+           dev,
+           "usb",
+           "usb_device");
+    if (parent_dev) {
+    /* usb_device_get_devnode() returns the path to the device node
+       itself in /dev. */
+    s[kk++]=g_strconcat("Node: ",udev_device_get_devnode(dev),NULL);
+    s[kk++]=g_strconcat("Subsystem: ", udev_device_get_subsystem(dev),NULL);
+    s[kk++]=g_strconcat("Devtype:", udev_device_get_devtype(dev),NULL);
+
+     dev = udev_device_get_parent_with_subsystem_devtype(
+           dev,
+           "usb",
+           "usb_device");
+  
+
+    s[kk++]=g_strconcat("VID/PID: ",
+            udev_device_get_sysattr_value(dev,"idVendor"),
+            udev_device_get_sysattr_value(dev, "idProduct"),NULL);
+    s[kk++]=g_strconcat("Product & Manufacturer: ",udev_device_get_sysattr_value(dev,"manufacturer"),
+            "   ",
+            udev_device_get_sysattr_value(dev,"product"),NULL);
+     s[kk++]=g_strconcat("serial: ",
+             udev_device_get_sysattr_value(dev, "serial"),NULL);
+    udev_device_unref(dev);
+     s[kk++]=g_strconcat("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@",NULL);
+  }}
+  /* Free the enumerator object */
+  udev_enumerate_unref(enumerate);
+
+  udev_unref(udev);
+   
+   
+  
+ 
+
+
+  s[kk]=NULL;
+  *valueOut = s;
+  
   /* Return success. */
   return TRUE;
 }
@@ -369,10 +458,23 @@ gboolean value_object_getvalue1(ValueObject* obj, gchar** valueOut,gchar** value
 gboolean value_object_getvalue2(ValueObject* obj, gchar** valueOut,
                                                   GError** error) {
   dbg("Called (internal value2 is %s)", obj->value2);
+/*   udev = udev_new();
+  if (!udev) {
+    dbg("Can't create udev\n");
+    exit(1);
+  }
+  enumerate = udev_enumerate_new(udev);
+  udev_enumerate_add_match_subsystem(enumerate, "block");
+  gchar*** value_out;
 
-  g_assert(obj != NULL);
-
-
+ udev_enumerate_scan_devices(enumerate);
+  devices = udev_enumerate_get_list_entry(enumerate);
+  
+  udev_list_entry_foreach(dev_list_entry, devices) {
+    value_object_getvalue1(obj,value_out,error);
+  }*/
+gchar*** value_out;
+    value_object_getvalue1(obj,value_out,error);
   *valueOut = obj->value2;
   return TRUE;
 }
@@ -386,6 +488,73 @@ static void handleError(const char* msg, const char* reason,
   if (fatal) {
     exit(EXIT_FAILURE);
   }
+}
+
+
+
+static gboolean timerCallback( CallbackObject* callbackObj) { 
+  struct udev_monitor* mon = callbackObj->mon;
+  ValueObject* obj = callbackObj->valueObj;
+  struct udev_device *dev;
+   int fd;
+  /* Get the file descriptor (fd) for the monitor.
+     This fd will get passed to select() */
+  fd = udev_monitor_get_fd(mon);
+
+
+
+fd_set fds;
+struct timeval tv;
+int ret;
+
+FD_ZERO(&fds);
+    FD_SET(fd, &fds);
+    tv.tv_sec = 0;
+    tv.tv_usec = 0;
+    
+    ret = select(fd+1, &fds, NULL, NULL, &tv);
+   
+ 
+  if (ret > 0 && FD_ISSET(fd, &fds)) {
+    
+    /* Make the call to receive the device.
+       select() ensured that this will not block. */
+    dev = udev_monitor_receive_device(mon);
+    if (dev) {
+      if(g_strcmp0(udev_device_get_action(dev),"remove") != 0){
+        g_print("Got Device\n");
+        g_print("   Node: %s\n", udev_device_get_devnode(dev));
+        g_print("   Subsystem: %s\n", udev_device_get_subsystem(dev));
+        g_print("   Devtype: %s\n", udev_device_get_devtype(dev));
+        g_print("   Action: %s\n",udev_device_get_action(dev));
+        
+        dev = udev_device_get_parent_with_subsystem_devtype(dev,
+                "usb",
+                "usb_device");
+        g_print("  VID/PID: %s %s\n",
+              udev_device_get_sysattr_value(dev,"idVendor"),
+              udev_device_get_sysattr_value(dev, "idProduct"));
+        g_print("  %s\n  %s\n",
+                udev_device_get_sysattr_value(dev,"manufacturer"),
+                udev_device_get_sysattr_value(dev,"product"));
+        g_print("  serial: %s\n",
+                udev_device_get_sysattr_value(dev, "serial"));
+        value_object_emitSignal(obj, E_SIGNAL_CHANGED_VALUE1, udev_device_get_sysattr_value(dev, "serial") );
+        }
+        else if(g_strcmp0(udev_device_get_action(dev),"remove") == 0){
+              value_object_emitSignal(obj, E_SIGNAL_CHANGED_VALUE1, "usb removed");
+
+        }
+       /* value_object_emitSignal(obj, E_SIGNAL_CHANGED_VALUE1,  udev_device_get_sysattr_value(dev, "serial"));*/
+      udev_device_unref(dev);
+
+    }
+    else {
+      g_print("No Device from receive_device(). An error occured.\n");
+    }
+
+  }
+  return TRUE;
 }
 
 /**
@@ -405,8 +574,9 @@ static void handleError(const char* msg, const char* reason,
  * This program will not exit (unless it encounters critical errors).
  */
 int main(int argc, char** argv) {
- /* setlocale(LC_ALL, "en_US.utf8");*/
   /* The GObject representing a D-Bus connection. */
+ 
+  setlocale(LC_ALL, "en_US.utf8");
   DBusGConnection* bus = NULL;
   /* Proxy object representing the D-Bus service object. */
   DBusGProxy* busProxy = NULL;
@@ -419,8 +589,23 @@ int main(int argc, char** argv) {
   guint result;
   GError* error = NULL;
 
+ 
   /* Initialize the GType/GObject system. */
   g_type_init();
+
+    struct udev *udev;
+
+  udev = udev_new();
+  struct udev_monitor *mon;
+  if (!udev) {
+    dbg("Can't create udev\n");
+    exit(1);
+  }
+  
+/* Set up a monitor to monitor hidraw devices */
+  mon = udev_monitor_new_from_netlink(udev, "udev");
+  udev_monitor_filter_add_match_subsystem_devtype(mon, "block", "disk");
+  udev_monitor_enable_receiving(mon);
 
   /* Create a main loop that will dispatch callbacks. */
   mainloop = g_main_loop_new(NULL, FALSE);
@@ -572,7 +757,11 @@ int main(int argc, char** argv) {
   g_print(PROGNAME
           ": Not daemonizing (built with NO_DAEMON-build define)\n");
 #endif
+  CallbackObject* callbackObj = malloc(sizeof(CallbackObject));
+  callbackObj->valueObj = valueObj;
+  callbackObj->mon = mon;
 
+   g_timeout_add(1000, (GSourceFunc)timerCallback, callbackObj);
   /* Start service requests on the D-Bus forever. */
   g_main_loop_run(mainloop);
   /* This program will not terminate unless there is a critical

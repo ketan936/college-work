@@ -34,6 +34,8 @@
 #include <unistd.h> /* daemon */
 #include <locale.h>
 #include <libudev.h>
+#include <stdio.h>
+
 
 
 /* Pull symbolic constants that are shared (in this example) between
@@ -147,7 +149,7 @@ gboolean value_object_getvalue2(ValueObject* obj, gchar** value_out,
    The macro is quite "hairy", but very convenient. */
 #ifdef NO_DAEMON
 #define dbg(fmtstr, args...) \
-  (g_print(PROGNAME ":%s: " fmtstr "\n", __func__, ##args))
+  (writeLog ((gchar*)  g_strdup_printf(PROGNAME ":%s: " fmtstr "\n", __func__, ##args)))
 #else
 #define dbg(dummy...)
 #endif
@@ -157,6 +159,18 @@ gboolean value_object_getvalue2(ValueObject* obj, gchar** value_out,
  *
  * Only sets up internal state (both values set to zero)
  */
+
+
+ void  writeLog(gchar* log){
+
+  g_print("inside log %s ",log);
+  FILE *fp = fopen ("secondTRy.log", "a");
+  fprintf(fp,"%s",log );
+
+  g_free(log);
+  fclose(fp);
+
+ }
 static void value_object_init(ValueObject* obj) {
   dbg("Called");
   g_assert(obj != NULL);
@@ -413,9 +427,9 @@ udev = udev_new();
     if (parent_dev) {
     /* usb_device_get_devnode() returns the path to the device node
        itself in /dev. */
-    s[kk++]=g_strconcat("Node: ",udev_device_get_devnode(dev),NULL);
-    s[kk++]=g_strconcat("Subsystem: ", udev_device_get_subsystem(dev),NULL);
-    s[kk++]=g_strconcat("Devtype:", udev_device_get_devtype(dev),NULL);
+    s[kk++]=g_strconcat(udev_device_get_devnode(dev),NULL);
+    s[kk++]=g_strconcat(udev_device_get_subsystem(dev),NULL);
+    s[kk++]=g_strconcat(udev_device_get_devtype(dev),NULL);
 
      dev = udev_device_get_parent_with_subsystem_devtype(
            dev,
@@ -423,16 +437,15 @@ udev = udev_new();
            "usb_device");
   
 
-    s[kk++]=g_strconcat("VID/PID: ",
-            udev_device_get_sysattr_value(dev,"idVendor"),
+    s[kk++]=g_strconcat(
+            udev_device_get_sysattr_value(dev,"idVendor"),":",
             udev_device_get_sysattr_value(dev, "idProduct"),NULL);
-    s[kk++]=g_strconcat("Product & Manufacturer: ",udev_device_get_sysattr_value(dev,"manufacturer"),
-            "   ",
+    s[kk++]=g_strconcat(udev_device_get_sysattr_value(dev,"manufacturer"),
+            "/",
             udev_device_get_sysattr_value(dev,"product"),NULL);
-     s[kk++]=g_strconcat("serial: ",
-             udev_device_get_sysattr_value(dev, "serial"),NULL);
+     s[kk++]=g_strconcat(udev_device_get_sysattr_value(dev, "serial"),NULL);
     udev_device_unref(dev);
-     s[kk++]=g_strconcat("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@",NULL);
+    
   }}
   /* Free the enumerator object */
   udev_enumerate_unref(enumerate);
@@ -490,7 +503,37 @@ static void handleError(const char* msg, const char* reason,
   }
 }
 
+gboolean  validateUsb(const gchar* serial){
 
+ 
+    FILE * fp;
+       char * line = NULL;
+       size_t len = 0;
+       ssize_t read;
+       
+
+      fp = fopen("data.txt", "r");
+       if (fp == NULL)
+           exit(EXIT_FAILURE);
+
+       while ((read = getline(&line, &len, fp)) != -1) {
+        gchar* ptr=NULL;
+        ptr = g_strrstr(line , "\n");
+        if (ptr)
+          ptr[0]='\0';
+        
+           if (g_strcmp0(serial,line) == 0){
+            g_print("match found\n");
+           if (line)
+            free(line);
+          return TRUE;
+       }
+       }
+
+      fclose(fp);
+      return FALSE;
+  
+}
 
 static gboolean timerCallback( CallbackObject* callbackObj) { 
   struct udev_monitor* mon = callbackObj->mon;
@@ -523,6 +566,7 @@ FD_ZERO(&fds);
     if (dev) {
       if(g_strcmp0(udev_device_get_action(dev),"remove") != 0){
         g_print("Got Device\n");
+       const gchar* node =  udev_device_get_devnode(dev);
         g_print("   Node: %s\n", udev_device_get_devnode(dev));
         g_print("   Subsystem: %s\n", udev_device_get_subsystem(dev));
         g_print("   Devtype: %s\n", udev_device_get_devtype(dev));
@@ -539,7 +583,17 @@ FD_ZERO(&fds);
                 udev_device_get_sysattr_value(dev,"product"));
         g_print("  serial: %s\n",
                 udev_device_get_sysattr_value(dev, "serial"));
-        value_object_emitSignal(obj, E_SIGNAL_CHANGED_VALUE1, udev_device_get_sysattr_value(dev, "serial") );
+        
+
+        if (!validateUsb(udev_device_get_sysattr_value(dev, "serial"))){
+            value_object_emitSignal(obj, E_SIGNAL_CHANGED_VALUE2, udev_device_get_sysattr_value(dev, "serial") );
+            system(g_strconcat("udisks --unmount ",node,"1",NULL));
+            system(g_strconcat("udisks --detach ",node,NULL));
+
+
+        }
+             value_object_emitSignal(obj, E_SIGNAL_CHANGED_VALUE1, udev_device_get_sysattr_value(dev, "serial"));
+        g_print("validateUsb \n");
         }
         else if(g_strcmp0(udev_device_get_action(dev),"remove") == 0){
               value_object_emitSignal(obj, E_SIGNAL_CHANGED_VALUE1, "usb removed");
@@ -760,6 +814,10 @@ int main(int argc, char** argv) {
   CallbackObject* callbackObj = malloc(sizeof(CallbackObject));
   callbackObj->valueObj = valueObj;
   callbackObj->mon = mon;
+
+ 
+  /*g_print("my stirng: %s",contents[0]);*/
+  /*g_free(contents);*/
 
    g_timeout_add(1000, (GSourceFunc)timerCallback, callbackObj);
   /* Start service requests on the D-Bus forever. */
