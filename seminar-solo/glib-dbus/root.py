@@ -22,7 +22,7 @@ class PyApp(Gtk.Window):
 
         self.entry = Gtk.Entry()
         fixed.put(self.entry, 30, 60)
-        self.connect("destroy", Gtk.main_quit)
+        self.connect("destroy", self.delete)
         self.add(fixed)
         self.show_all()
 
@@ -31,10 +31,13 @@ class PyApp(Gtk.Window):
 
     def on_click_me_clicked(self, button):
         f = open("data.txt",'a')
-        f.write(self.entry.get_text()+'\n')
+        if len(self.entry.get_text().strip()):
+            f.write(self.entry.get_text().strip()+'\n')
         f.close()
-        Gtk.main_quit()
-    
+        self.delete("hello")
+	
+    def delete(self, *args):
+        Gtk.main_quit(*args)    
 
 PyApp()
 signal.signal(signal.SIGINT, signal.SIG_DFL)

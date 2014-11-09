@@ -7,6 +7,7 @@
     <property name="title" translatable="yes">Attention</property>
     <property name="window_position">center</property>
     <property name="type_hint">dialog</property>
+    <property name="message_type">warning</property>
     <property name="buttons">ok</property>
     <property name="text" translatable="yes">&lt;b&gt;USB has been blocked&lt;/b&gt;</property>
     <property name="use_markup">True</property>
@@ -30,6 +31,12 @@
       </object>
     </child>
   </object>
+  <object class="GtkListStore" id="serial">
+    <columns>
+      <!-- column-name Serial -->
+      <column type="gchararray"/>
+    </columns>
+  </object>
   <object class="GtkListStore" id="usbdata">
     <columns>
       <!-- column-name Node -->
@@ -51,7 +58,6 @@
     <property name="window_position">center</property>
     <property name="default_width">600</property>
     <property name="default_height">400</property>
-    <property name="type_hint">dialog</property>
     <signal name="delete-event" handler="delete" swapped="no"/>
     <signal name="destroy" handler="delete" swapped="no"/>
     <child>
@@ -108,6 +114,7 @@
                 <property name="label" translatable="yes">Logs</property>
                 <property name="use_underline">True</property>
                 <property name="stock_id">gtk-select-all</property>
+                <signal name="clicked" handler="view_logs" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -140,31 +147,10 @@
           <object class="GtkBox" id="box2">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <child>
-              <object class="GtkScrolledWindow" id="scrolledwindow1">
-                <property name="width_request">140</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="resize_mode">immediate</property>
-                <property name="shadow_type">in</property>
-                <child>
-                  <object class="GtkTreeView" id="treeview1">
-                    <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <child internal-child="selection">
-                      <object class="GtkTreeSelection" id="treeview-selection1"/>
-                    </child>
-                  </object>
-                </child>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
+            <property name="baseline_position">top</property>
             <child>
               <object class="GtkScrolledWindow" id="scrolledwindow2">
+                <property name="width_request">270</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="shadow_type">in</property>
@@ -250,6 +236,46 @@
               <packing>
                 <property name="expand">True</property>
                 <property name="fill">True</property>
+                <property name="pack_type">end</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkScrolledWindow" id="scrolledwindow1">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="shadow_type">in</property>
+                <child>
+                  <object class="GtkTreeView" id="treeview1">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="hscroll_policy">natural</property>
+                    <property name="model">serial</property>
+                    <property name="enable_grid_lines">vertical</property>
+                    <child internal-child="selection">
+                      <object class="GtkTreeSelection" id="treeview-selection1"/>
+                    </child>
+                    <child>
+                      <object class="GtkTreeViewColumn" id="treeviewcolumn7">
+                        <property name="resizable">True</property>
+                        <property name="sizing">autosize</property>
+                        <property name="title" translatable="yes">Trusted Serial</property>
+                        <property name="expand">True</property>
+                        <child>
+                          <object class="GtkCellRendererText" id="cellrenderertext7"/>
+                          <attributes>
+                            <attribute name="text">0</attribute>
+                          </attributes>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="pack_type">end</property>
                 <property name="position">1</property>
               </packing>
             </child>
@@ -286,6 +312,7 @@
     <property name="title" translatable="yes">Add Serial</property>
     <property name="default_width">300</property>
     <property name="default_height">100</property>
+    <property name="type_hint">dialog</property>
     <child>
       <object class="GtkBox" id="box3">
         <property name="visible">True</property>
@@ -392,6 +419,71 @@
             <property name="expand">True</property>
             <property name="fill">False</property>
             <property name="position">2</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+  </object>
+  <object class="GtkWindow" id="window3">
+    <property name="can_focus">False</property>
+    <property name="title" translatable="yes">Service Logs</property>
+    <property name="window_position">center</property>
+    <property name="default_width">501</property>
+    <property name="default_height">350</property>
+    <property name="destroy_with_parent">True</property>
+    <property name="deletable">False</property>
+    <signal name="delete-event" handler="close_logs" swapped="no"/>
+    <signal name="destroy-event" handler="close_logs" swapped="no"/>
+    <child>
+      <object class="GtkBox" id="box7">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="orientation">vertical</property>
+        <child>
+          <object class="GtkScrolledWindow" id="scrolledwindow4">
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="margin_left">10</property>
+            <property name="margin_right">10</property>
+            <property name="margin_top">10</property>
+            <property name="margin_bottom">5</property>
+            <property name="shadow_type">in</property>
+            <child>
+              <object class="GtkTextView" id="textview1">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="margin_top">1</property>
+                <property name="editable">False</property>
+                <property name="cursor_visible">False</property>
+              </object>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">True</property>
+            <property name="fill">True</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButton" id="button2">
+            <property name="label">gtk-close</property>
+            <property name="width_request">70</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <property name="halign">end</property>
+            <property name="valign">baseline</property>
+            <property name="margin_right">10</property>
+            <property name="margin_bottom">3</property>
+            <property name="use_stock">True</property>
+            <property name="always_show_image">True</property>
+            <signal name="clicked" handler="close_logs" swapped="no"/>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="padding">1</property>
+            <property name="position">1</property>
           </packing>
         </child>
       </object>

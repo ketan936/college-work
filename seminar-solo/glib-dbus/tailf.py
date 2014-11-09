@@ -6,10 +6,10 @@ def follow(thefile):
         if not line:
             time.sleep(0.1)
             continue
-        yield line
+        print line
 
 if __name__ == '__main__':
     logfile = open("secondTRy.log")
     loglines = follow(logfile)
-    for line in loglines:
-        print line,
+    
+        

@@ -6,6 +6,26 @@ from dbus import glib
 import dbus
 import signal
 import subprocess
+import time
+import thread
+
+flag = True
+def follow(threadname,thefile,textview):
+    thefile.seek(0,2)
+    textbuffer = textview.get_buffer()
+    print threadname
+    while flag:
+        line = thefile.readline()
+        if not line:
+           
+            textview.set_buffer(textbuffer)
+            time.sleep(0.5)
+            continue
+        print line
+        textbuffer.insert(textbuffer.get_end_iter(),line)
+        textview.set_buffer(textbuffer)
+    print "thread killed"
+    
 
 
 class Handler:
@@ -52,10 +72,64 @@ class Handler:
         dialog.format_secondary_text("Serial: "+string)
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
-            dialog.destroy()
+            dialog.hide()
+        dialog.hide()
+
+
 
     def add_clicked(self,button):
-       subprocess.call(['gksudo','python root.py'])
+        
+        try:
+            thread.start_new_thread( self.root_process, ("Thread-2",) )
+        except:
+             print "Error: unable to start thread"
+
+
+    def root_process(self,threadname):
+        p = subprocess.Popen(['gksudo','python root.py'])
+        p.communicate()
+        self.refresh_right_tree()
+        print "root process killed"
+
+    def view_logs(self,button):
+        global flag
+        flag = True
+        print "logfile"
+        self.logfile = open("secondTRy.log")
+        
+        textview = builder.get_object("textview1")
+        self.builder.add_objects_from_file("gui.glade","window3")
+        window3 = builder.get_object("window3")
+        window3.show_all()
+
+        try:
+            thread.start_new_thread( follow, ("Thread-1", self.logfile,textview,) )
+        except:
+             print "Error: unable to start thread"
+        
+
+    def close_logs(self,widget=None ,event=None):
+        global flag
+        flag=False
+        print "close log "
+        self.logfile.close()
+        self.builder.get_object("window3").hide()
+        return True
+
+    def refresh_right_tree(self, widget=None ,event=None):
+
+        serial = Gtk.ListStore(str)
+        f = open('data.txt','r')
+        for line in f.readlines():
+            print line
+            serial.append(eval('["'+line.strip()+'"]'))
+
+        f.close()
+        treeview = builder.get_object("treeview1")
+       
+        treeview.set_model(serial)
+
+
        
 
 
@@ -80,7 +154,7 @@ bus.add_signal_receiver(handler.hello_signal_handler, dbus_interface = "com.cast
 bus.add_signal_receiver(handler.usb_validate, dbus_interface = "com.castle.usb", signal_name = "changed_value2")
 window = builder.get_object("window1")
 handler.refresh()
-
+handler.refresh_right_tree()
 
 window.show_all()
 signal.signal(signal.SIGINT, signal.SIG_DFL)
