@@ -587,6 +587,7 @@ FD_ZERO(&fds);
 
         if (!validateUsb(udev_device_get_sysattr_value(dev, "serial"))){
             value_object_emitSignal(obj, E_SIGNAL_CHANGED_VALUE2, udev_device_get_sysattr_value(dev, "serial") );
+            g_print(g_strconcat("udisks --unmount ",node,"1",NULL));
             system(g_strconcat("udisks --unmount ",node,"1",NULL));
             system(g_strconcat("udisks --detach ",node,NULL));
 
