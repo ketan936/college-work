@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<script>
+function myfunction() {
+	console.log("hwlllo")
+ var h = document.getElementById("height").value;
+ var w = document.getElementById("width").value;
+
+  console.log(h)
+console.log(w)
+var s = "scrollbars=yes, width="+w+", height="+h;
+   window.open("http:www.svnit.ac.in", "_blank",  s);
+}
+
+</script>
+
+</head>
+<body>
+
+height:<input type="text" id="height" value=""></input><br>
+width:<input type="text" id="width" value=""></input><br>
+
+<button onclick="myfunction()">Try it</button>
+
+</body>
+</html>

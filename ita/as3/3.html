@@ -1,0 +1,25 @@
+<!DOCTYPE html >
+<html>
+ <script>
+document.getElementById("display").value="";
+ function alertme()
+ {
+ var str = document.getElementById("name").value;
+ console.log(str.length);
+ if(str.length<1)
+ alert("first enter the name");
+ else{
+ var hello=document.getElementById("display").value
+ console.log(str);
+ console.log(hello)
+ document.getElementById("display").value="welcome"+document.getElementById("display").value+" "+str+"!!";
+ }
+ return true; 
+ }
+ </script>
+ <body>
+ Name:<input type="text" id="name" value=""></input>
+<button onclick="alertme()">submit</button><br>
+<input type="text" id="display" value=""></input>
+<body>
+</html>

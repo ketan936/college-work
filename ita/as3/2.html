@@ -1,0 +1,20 @@
+<!DOCTYPE html >
+<html>
+	<script src="jquery.js"></script> 
+ <script>
+ function alertme()
+ {
+ var str = document.getElementById("name").value;
+ var hello=document.getElementById("display").value
+ console.log(str);
+ console.log(hello)
+ document.getElementById("display").value="welcome"+document.getElementById("display").value+" "+str+"!!";
+ return true; 
+ }
+ </script>
+ <body>
+ Name:<input type="text" id="name" value=""></input>
+<button onclick="alertme()">submit</button><br>
+<input type="text" id="display" ></input>
+<body>
+</html>

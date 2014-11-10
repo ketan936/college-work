@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+
+
+<head>
+<script>
+function myFunction() {
+var str=document.getElementById("input").value;
+var temp=document.getElementById("outputc").value;
+var temp2=document.getElementById("inputc").value;
+console.log(str);
+console.log(temp);
+console.log(temp2);
+var regex = new RegExp(temp, "g");
+console.log(regex);
+var res = str.replace(regex,temp2);
+console.log(res);
+document.getElementById("demo").innerHTML=document.getElementById("demo").innerHTML+"     "+res;
+console.log(res);
+return true;   
+}
+</script>
+<head>
+<body>
+Enter string<input type ="text" id ="input" ></input><br>
+Enter char<input type ="text" id ="outputc" ></input><br>
+Enter char<input type ="text" id ="inputc" ></input><br>
+<button onclick="myFunction()">submit</button>
+<p id="demo">Answer is !</p>
+</body>
+</html>
