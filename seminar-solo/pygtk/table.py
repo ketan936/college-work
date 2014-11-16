@@ -1,13 +1,12 @@
+from dbus import glib 
+import dbus
 from gi.repository import GObject
 from gi.repository import Gtk
-
-from dbus import glib 
-
-import dbus
 import signal
 import subprocess
-import time
 import thread
+import time
+
 
 flag = True
 def follow(threadname,thefile,textview):
