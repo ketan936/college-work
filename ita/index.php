@@ -6,7 +6,7 @@
 	<title>Regeistration Form</title>
 
 	<body>
-		<form action="index_submit" name="reg_form" onsubmit="return validateForm()" method="get" accept-charset="utf-8" class="basic-grey">
+		<form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>"class="basic-grey">
 			<h1 id="test">Registration Form <span>please fill the below form</span></h1>
 			<p>
 				<label for="user">User Id</label>
@@ -27,6 +27,11 @@
 			<p>
 				<label for="zipcode">Zipcode</label>
 				<input type="text" name="zipcode" value="" id="zipcode"/>
+			</p>
+			<p>
+				<label for="checkbox">Checkbox</label>
+				<input type="checkbox" name="vehicle[]" value="Bike">I have a bike<br>
+				<input type="checkbox" name="vehicle[]" value="Car">I have a car 
 			</p>
 
 			<p>
@@ -53,5 +58,21 @@
 				<input type="submit" id="submit" value="Continue &rarr;"/>
 			</p>
 		</form>
+		<?php
+echo "<h2>Your Input:</h2> ";
+print_r($_POST); 
+echo "</br>";
+foreach ( $_POST as $key => $value )
+{
+	if ($key == "vehicle"){
+		echo "vehicle:";
+		foreach ($value as $checkbox) {
+			echo "$checkbox</br>";
+		}
+	}
+	else
+  echo "$key : $value </br></br>";
+}
+?>
 	</body>
 </html>
