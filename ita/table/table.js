@@ -3,11 +3,7 @@ function write_data(data) {
 	document.querySelector("#result > p").innerHTML = data;
 }
 
-
-
 function findRowCount(element) {
-	
-	console.log(rows);
 	for (i = 0; i < rows.length; i++) {
 		if (rows[i] == element)
 			return i;
@@ -26,15 +22,15 @@ mouseoutFunction = function() {
 	this.className = "";
 };
 
-
 mainFunction = function() {
 	rows = document.getElementsByTagName("tr");
 	tags = document.getElementsByTagName("td");
-	console.log("main function is loaded");
+	console.log("Main function is loaded");
 	for (i = 0; i < tags.length; i++) {
 		tag = tags[i];
 		tag.addEventListener("mouseover", mouseoverFunction);
 		tag.addEventListener("mouseout", mouseoutFunction);
 	}
 };
-window.addEventListener("load",mainFunction);
+
+window.addEventListener("load", mainFunction);
