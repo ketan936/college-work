@@ -1,48 +1,40 @@
 function write_data(data) {
-$("#result p").html(data);
+	console.log("Write data is called");
+	document.querySelector("#result > p").innerHTML = data;
 }
 
 
+
+function findRowCount(element) {
 	
-	/*$("td").hover(function() {
-		write_data(($(this).parent("tr").index() + 1) +"x" + ($(this).index() + 1));
-		$(this).addClass("hover");
-	},function(){
-		$(this).removeClass("hover");
-	});*/
-rows = document.getElementsByTagName("tr");
-function findRowCount(element){
 	console.log(rows);
-for (i=0; i<rows.length; i++){
-	if (rows[i] == element)
-		return i;
-}
+	for (i = 0; i < rows.length; i++) {
+		if (rows[i] == element)
+			return i;
+	}
 
 }
-mouseoverFunction = function (){
-			console.log("function is called");
-			write_data( findRowCount(this.parentElement) +"x" + (this.cellIndex+1));
-			p = this;
-			k = this.parentElement;
-			n = this.parentNode;
-			console.log(k.cellIndex);
-			this.className = "hover";
-		};
-mouseoutFunction = function (){
-	
+
+mouseoverFunction = function() {
+	console.log("Mouseover function is called");
+	write_data(findRowCount(this.parentElement) + "x" + (this.cellIndex + 1));
+	this.className = "hover";
+};
+
+mouseoutFunction = function() {
+	console.log("Mouseout function is called");
 	this.className = "";
 };
 
 
-console.log("outside windows")	
-
-	console.log("hello"); 
+mainFunction = function() {
+	rows = document.getElementsByTagName("tr");
 	tags = document.getElementsByTagName("td");
-
-	console.log(tags);
-	for (i=0; i<tags.length; i++){
+	console.log("main function is loaded");
+	for (i = 0; i < tags.length; i++) {
 		tag = tags[i];
-		console.log("hello");
-		tag.addEventListener("mouseover",mouseoverFunction);
-		tag.addEventListener("mouseout",mouseoutFunction);
+		tag.addEventListener("mouseover", mouseoverFunction);
+		tag.addEventListener("mouseout", mouseoutFunction);
 	}
+};
+window.addEventListener("load",mainFunction);
