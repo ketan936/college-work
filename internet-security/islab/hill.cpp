@@ -80,6 +80,9 @@ int findDet(int **a,int n)
 	while(det<0)
 		det+=MOD;
 	det%=MOD;
+	
+	cout << det;
+
 	return det;
 }
 void getTranspose(int **a,int n)
