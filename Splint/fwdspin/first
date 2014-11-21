@@ -1,0 +1,12 @@
+proctype hello() {
+ printf ("hello\n");
+printf("hello process, %d\n",_pid);
+}
+proctype world() {
+ printf ("world\n");
+printf("world process, %d\n",_pid);
+}
+init {
+printf("world processs %d\n",_pid);
+run hello(); run world(); 
+}

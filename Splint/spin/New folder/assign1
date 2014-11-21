@@ -1,0 +1,31 @@
+proctype vendor(chan coins,chocs)
+{
+	byte x=0;
+	
+	
+	do
+		
+		::(x==0)-> coins?x;
+		::(x==5) -> printf("got 5 coin\n");chocs!1;  x=0;
+		::(x==10)->  printf(" got 10 coins\n");chocs!2; x=0;
+	od
+	
+}
+proctype customer(chan coins,chocs)
+{
+	byte c;
+	
+	do
+		:: coins!5 ; chocs?c ; printf("Its milk chocolate %d\n",c);
+		:: coins!10; chocs?c;printf("Its plain chocolate %d\n",c); 
+	od
+}
+init
+{	
+	chan coins = [10] of {byte};
+	chan chocs = [10] of {byte};
+	run vendor(coins,chocs);
+	run customer(coins,chocs);
+		
+	
+}

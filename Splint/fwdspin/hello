@@ -1,0 +1,13 @@
+proctype he()
+{
+  printf("Hello!!")
+}
+
+proctype we()
+{
+  printf("world!!")
+}
+init
+{
+run he(); run we();
+}

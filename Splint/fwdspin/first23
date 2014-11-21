@@ -1,0 +1,23 @@
+#define true 1
+#define false 0 
+#define aturn 1
+#define  bturn 0
+bool aruns , bruns ,t ;
+
+active proctype A() {
+aturn 0 ;
+t = btrun;
+(bruns==false || t==aruns) ;
+aruns = false;
+}
+
+active proctype B() {
+bturn = true ;
+t = atrun;
+(aruns==false || t==bruns) ;
+bruns = false;
+}
+
+init {
+run A() ; run B(); 
+}

@@ -1,0 +1,23 @@
+#define true 1 false 0 Aturn 1 Bturn 0
+bool Aruns,Bruns,t; 
+proctype A()
+{
+  Aruns=true;
+  t=Bturn;
+  (Bruns == false || t==Aturn);
+  printf("A has entered the critical section\n");
+   Aruns=false;
+}
+proctype B()
+{
+  Bruns=true;
+  t=Aturn;
+  (Aruns == false || t==Bturn);
+  printf("B has entered the critical section\n");
+   Bruns=false;
+}
+
+init
+{
+{  run A(); run B(); }
+}

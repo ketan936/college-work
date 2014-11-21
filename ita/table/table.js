@@ -1,4 +1,4 @@
-function write_data(data) {
+function writeData(data) {
 	console.log("Write data is called");
 	document.querySelector("#result > p").innerHTML = data;
 }
@@ -13,8 +13,10 @@ function findRowCount(element) {
 
 mouseoverFunction = function() {
 	console.log("Mouseover function is called");
-	write_data(findRowCount(this.parentElement) + "x" + (this.cellIndex + 1));
+	writeData(findRowCount(this.parentElement) + "x" + (this.cellIndex + 1));
 	this.className = "hover";
+	hoverCell =this;
+
 };
 
 mouseoutFunction = function() {
