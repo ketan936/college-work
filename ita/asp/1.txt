@@ -1,0 +1,17 @@
+<html>
+<body>
+
+<script language="jscript">
+function hello()
+{
+response.write("hello world")
+}
+
+</script>
+
+<%
+hello()
+%>
+
+</body>
+</html>
