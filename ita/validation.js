@@ -1,4 +1,5 @@
-function validateForm() {
+validateForm = function(e) {
+    console.log("validateForm asdf;");
     var x=document.forms["reg_form"]["user"].value;
    if (x==null || x=="") {
         alert("user-id cannot be empty");
@@ -57,7 +58,20 @@ x = document.forms["reg_form"]["email"].value;
     if (atpos< 1 || dotpos<atpos+2 || dotpos+2>=x.length) {
         alert("Not a valid e-mail address");
         return false;
-    }
+    };
 
-
+stop = function(e){
+    e.preventDefault();
+};
 }
+mainFunction = function() {
+  
+    tag = document.reg_form;
+    console.log("Main function is loaded");
+        tag.addEventListener("action", stop );
+        tag.addEventListener("submit", validateForm,false);
+       
+    
+};
+
+window.addEventListener("load", mainFunction);

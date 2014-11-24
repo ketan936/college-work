@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<link rel="stylesheet" href="form.css" type="text/css" media="screen" title="no title" charset="utf-8"/>
+<script src="jquery.min.js"></script>
+<script src="validation.js"></script>	
+<html>
+	<title>Regeistration Form</title>
+
+	<body>
+		<form action="form.html" name="reg_form" id="form-id" method="get" accept-charset="utf-8" class="basic-grey">
+			<h1 id="test">Registration Form <span>please fill the below form</span></h1>
+			<p>
+				<label for="user">User Id</label>
+				<input type="text" name="user" value="" id="user"/>
+			</p>
+			<p>
+				<label for="Password">Password</label>
+				<input type="password" name="password" value="" id="" style="height: 30px; width: 70%"/>
+			</p>
+			<p>
+				<label for="name">Name</label>
+				<input type="text" name="name" value="" id="name"/>
+			</p>
+			<p>
+				<label for="address">Address</label>
+				<textarea name="address" rows="8" cols="40"></textarea>
+			</p>
+			<p>
+				<label for="zipcode">Zipcode</label>
+				<input type="text" name="zipcode" value="" id="zipcode"/>
+			</p>
+			<p>
+				<label for="checkbox">Checkbox</label>
+				<input type="checkbox" name="vehicle[]" value="Bike">I have a bike<br>
+				<input type="checkbox" name="vehicle[]" value="Car">I have a car 
+			</p>
+
+			<p>
+				<label for="country">Country</label>
+				<select name="country" id="country">
+					<option value="India">India</option>
+					<option value="UK">UK</option>
+				</select>
+			</p>
+			<p>
+				<label><b>Sex:</b></label>
+				Male: &nbsp;
+				<input type="radio" name="sex" value="male" checked=true id="male"/>
+				Female: &nbsp;
+				<input type="radio" name="sex" value="" id="female"/>
+
+			</p>
+			<p>
+				<label for="email">Email</label>
+				<input type="text" name="email" value="" id="email"/>
+			</p>
+
+			<p>
+				<input type="submit" id="submit" value="Continue &rarr;"/>
+			</p>
+		</form>
+
+	</body>
+</html>
