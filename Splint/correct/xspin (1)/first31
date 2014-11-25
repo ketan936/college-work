@@ -1,0 +1,17 @@
+int a ,b ,q,r;
+
+proctype A() {
+
+  do
+  ::  (a>= b)  ->  a=a-b; q=q+1;
+  ::  (b>a)  ->  r=a;  break;
+  od
+}
+
+init {
+
+a =7; b=2; 
+run A() ; 
+printf("result 1 =%d\n",q);
+ printf("result 1 =%d\n",r);
+}

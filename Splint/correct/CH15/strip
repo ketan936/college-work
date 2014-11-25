@@ -1,0 +1,48 @@
+/* strip C-style comments -- simple version */
+
+chan STDIN;
+
+#define FlipState in_comment = (in_comment -> false : true)
+
+inline Print() {
+	if
+	:: !in_comment -> printf("%c", c)
+	:: else /* inside a comment string */
+	fi;
+}
+inline Getc(prev) {
+	do
+	:: STDIN?c ->
+		if
+		:: c == -1 -> goto done
+		:: c != prev -> break
+		:: c == prev -> Print()
+		fi
+	od
+}
+inline Handle(have, expect) {
+	oc = have;
+	Getc(have);
+	nc = c;
+	if
+	:: c == expect -> FlipState; goto again
+	:: else -> c = oc; Print(); c = nc
+	fi
+}
+init {
+	int c, oc, nc;
+	bool in_comment;
+
+again:	do
+	:: Getc(0) ->
+		if
+		:: !in_comment && c == '/' ->
+			Handle('/', '*')
+		:: in_comment && c == '*' ->
+			Handle('*', '/')
+		:: else
+		fi;
+		Print()
+	od;
+done:	skip	/* saw the -1 end-of-file marker */
+}

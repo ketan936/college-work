@@ -1,0 +1,16 @@
+bit flag;
+byte mutex;
+proctype p (bit i) {
+flag ==1 ;
+mutex++; 
+printf(" process p(0) %d\n",i);
+mutex--;
+flag =0 ;
+}
+proctype moniter () {
+ assert (mutex !=2 );
+}
+init {
+printf("world processs %d\n",_pid);
+run p(0) ; run p (1); run moniter () ;
+}

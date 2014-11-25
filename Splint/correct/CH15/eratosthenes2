@@ -1,0 +1,42 @@
+mtype = { number, eof };
+
+chan found = [MAX] of { int };
+
+active proctype sieve()
+{  int n = 3;
+   int prime = 2;
+   int i;
+
+   found!prime;
+   printf("MSC: %d is prime\en", prime);
+   do
+   :: n < MAX ->
+        i = len(found);
+        assert(i > 0);
+        do
+        :: i > 0 ->
+            found?prime;
+            found!prime; /* put back at end */
+            if
+            :: (n%prime) == 0 ->
+            /*  printf("MSC: %d = %d*%d\en",
+                        n, prime, n/prime); */
+                break
+            :: else ->
+                i--
+            fi
+        :: else ->
+            break
+        od;
+        if
+        :: i == 0 ->
+            found!n;
+            printf("MSC: %d is prime number %d\en",
+                        n, len(found))
+        :: else
+        fi;
+        n++
+   :: else ->
+        break
+   od
+}

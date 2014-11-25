@@ -1,0 +1,21 @@
+%F	fahr.c
+%X	-a main
+%L
+# Modex Lookup Table for target <main>
+Declare	int	fahr	main
+Declare	int	celsius	main
+Declare	int	upper	main
+Declare	int	lower	main
+Declare	int	step	main
+
+C: (fahr<=upper)			keep
+C: !(fahr<=upper)			else
+
+A: lower=0				keep
+A: upper=300				keep
+A: step=20				keep
+A: fahr=lower				keep
+A: fahr=(fahr+step)			keep
+A: celsius=((5/9)*(fahr-32))		celsius = ((fahr-32)*5)/9
+F: printf(...				printf("%d  %d\n", fahr, celsius)
+%%

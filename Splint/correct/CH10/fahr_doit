@@ -1,0 +1,3 @@
+modex -u fahr.c > fahr_parse.dot	# and fix a split line
+modex -cfg fahr.c > fahr_cfg.dot
+dot -Tps -G"size=7,9" fahr_cfg.dot > fahr_cfg.ps

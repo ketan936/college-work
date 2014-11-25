@@ -1,0 +1,23 @@
+byte value1=1 ,value2 =2, value3 =3;
+proctype hello() {
+ printf ("hello\n");
+value3 = value3 + value2;
+
+}
+proctype hello1() {
+value3 = value3 + value2;
+}
+proctype hello3() {
+value3 = value3 + value2;
+}
+proctype hello4() {
+value3 = value3 + value2;
+}
+proctype hello5() {
+value3 = value3 + value2;
+}
+init {
+printf("world processs %d\n",_pid);
+run hello(); run hello1(); 
+run hello3(); run hello4(); run hello5();
+}

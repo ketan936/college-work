@@ -1,0 +1,44 @@
+mtype = { milk, plain };
+chan coin_channel = [1] of { byte };
+chan choc_channel = [1] of { mtype };
+int budget=45;
+int milk_bars, plain_bars;
+int coin_box = 0;
+proctype customer()
+{
+	do
+	:: coin_channel!5;
+	   choc_channel?milk;
+	:: coin_channel!10;
+	   choc_channel?plain;
+	od
+}
+proctype vender(chan res)
+{
+	do
+	:: ( coin_channel?[5] && budget>=5) ->
+		coin_channel?5;
+		choc_channel!milk;
+		milk_bars = milk_bars+1;
+		coin_box = coin_box + 5;
+		
+                    res! plain_bars,milk_bars;
+ 	
+	:: (coin_channel?[10] && budget>=10) ->
+		coin_channel?10;
+		choc_channel!plain;
+		plain_bars = plain_bars+1;
+		coin_box = coin_box + 10;
+	    
+                  res! plain_bars,milk_bars;
+	od
+}
+init { 
+ 
+int q,r;
+chan w = [1] of {int ,int};
+run vender( w); run customer(); 
+w ? q,r;
+printf("fdsfsdf %d %d \n",q,r);
+
+}

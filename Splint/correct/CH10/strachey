@@ -1,0 +1,7 @@
+init {	/* filename: strachey */
+	do
+	:: c_expr { system("halts strachey") } /* loop */
+	:: else -> break
+	od;
+	false	/* block the execution */
+}

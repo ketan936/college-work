@@ -1,0 +1,221 @@
+/*
+ * adds start message to match done message
+ */
+#if 0
+	spin -a -N never_3way tpc5
+	spin -a -N never_offh_nodial tpc5
+	spin -a -N offhook_nodialtone.aut tpc5
+#endif
+
+#define NS	1	/* nr of local subscribers */
+#define HC	2	/* qsize at handlers */
+#define NC	2	/* max nr of sessions per line */
+
+#define abort1	timeout
+#define abort2	timeout
+#define abort3	timeout
+
+mtype = { offhook, onhook, flash, hold, unhold, number, start, done };	/* signals */
+mtype = { none, dialtone, busytone, ringtone };		/* tones   */
+mtype = { idle, outgoing, incoming };			/* states  */
+
+mtype	tone[NS]      = none;
+
+chan handler[NS] = [HC] of { mtype };
+chan tpc         = [0]  of { mtype, pid };
+chan rtpc        = [0]  of { mtype, pid };
+
+proctype user(int who)	/* local subscribers */
+{				/* talks to the switch, listens for tones */
+	run manager(who);
+end:	do
+	:: tone[who] == ringtone ->		/* answering incoming call */
+		tpc!offhook,who;
+		goto connected
+	:: tpc!offhook,who ->
+		if
+		:: tone[who] == ringtone ->	/* race with incoming call */
+			goto connected
+		:: tone[who] == dialtone ->
+			if
+			:: tpc!number,who ->
+				/* wait for busy or hangup */
+connected:			if
+				:: tpc!flash,who;
+					if
+					:: tone[who] == dialtone ->
+						tpc!number,who;
+						goto connected
+					:: timeout
+					fi
+				:: skip
+				fi;
+				if
+				:: tone[who] == busytone
+				:: abort3
+				fi
+			:: abort2
+			fi	
+		:: abort1
+		fi;
+		tpc!onhook,who
+	od
+}
+
+proctype Session(pid who; int i; chan me; chan parent)
+{	mtype x;
+
+end:	do
+	:: me?x ->
+		if
+		:: x == start -> break
+		:: else -> printf("MSC: stray msg %e in %d:%d\n", x, who, i)
+		fi
+	od;
+	do
+	:: me?offhook ->
+		tone[who] = dialtone;
+		printf("MSC: set dialtone %d:%d\n", who, i);
+		do
+		:: me?hold -> printf("MSC: child %d:%d rcv hold\n", who, i)
+		:: me?unhold -> printf("MSC: child %d:%d rcv unhold\n", who, i)
+		:: me?offhook -> printf("MSC: child %d:%d rcv offhook - unhold\n", who, i)
+		:: me?number ->
+			if
+			:: tone[who] = ringtone ->
+				printf("MSC: set ringtone %d:%d\n", who, i);
+				tone[who] = none;	/* connected */
+				printf("MSC: connected %d:%d\n", who, i);
+				if
+				:: tone[who] = busytone;	/* simulate remote hangup */
+					printf("MSC: remote hangup, set busytone %d:%d\n", who, i)
+				:: skip		/* scenario where remote never hangs up */
+				fi
+	
+			:: tone[who] = busytone;	/* simulate remote busy */
+				printf("MSC: remote busy, set busytone %d:%d\n", who, i)
+			fi;
+zombie:			do
+			:: me?onhook -> break	/* wait for subscriber to go away */
+			:: me?hold -> printf("MSC: child %d:%d rcv hold\n", who, i)
+			:: me?unhold -> printf("MSC: child %d:%d rcv unhold\n", who, i)
+			:: me?offhook -> printf("MSC: child %d:%d rcv offhook - unhold\n", who, i)
+			:: me?number -> printf("MSC: stray number at %d:%d\n", who, i)
+			od;
+			break
+	
+		:: me?onhook -> break
+		od;
+		tone[who] = none;
+		printf("MSC: rcv onhook - back to idle %d:%d\n", who, i);
+		parent!i,done;
+		goto end
+	od
+}
+
+inline find_session() {
+	i = 0;
+	do
+	:: status[i] == idle -> cic = i; break	/* pick session */
+	:: else -> i++; assert(i < NC)		/* cannot fail  */
+	od;
+	printf("MSC: select session %d\n", i)
+}
+
+proctype manager(int who)	/* subscriber line management */
+{	chan child[NC] = [2] of { mtype };
+	chan parent = [2] of { byte, mtype };
+	mtype x, status[NC] = idle;
+	byte i, cic = NC;		/* child in control = active party */
+
+	atomic {
+		do
+		:: i < NC -> run Session(who, i, child[i], parent); i++
+		:: else   -> break
+		od
+	};
+end:	do
+	:: handler[who]?x ->
+		printf("MSC: msg %e for %d:%d\n", x, who, cic);
+		if
+		:: cic == NC ->			/* no active party */
+			printf("MSC: no controlling party %d:%d\n", who, cic);
+			if
+			:: x == offhook ->
+				printf("MSC: saw offhook %d\n", who);
+add:				find_session();			/* grab a session */
+				child[cic]!start;		/* activate it */
+				child[cic]!offhook;		/* child takes over */
+				status[cic] = outgoing		/* mark child busy  */
+			:: else ->
+				printf("MSC: stray message %e recvd at %d:%d\n", x, who, cic);
+			fi
+		:: else ->
+			if
+			:: x == flash ->
+				i = 0;
+				do
+				:: i < NC && i != cic
+				&& status[i] != idle ->		/* a held party */
+					printf("MSC: switch to %d %d:%d\n", cic, who, cic);
+					child[cic]!hold;	/* hold feature */
+					cic = i;		/* switch to it */
+					child[cic]!unhold;	/* hold feature */
+					break
+				:: i >= NC ->			/* no held party yet */
+					child[cic]!hold;	/* hold feature */
+					goto add		/* start new session */
+				:: else -> i++
+				od
+			:: else ->
+				printf("MSC: saw %e %d\n", x, who);
+				child[cic]!x		/* let child handle it */
+			fi
+		fi
+
+	:: parent?i,done ->				/* child says session ended */
+		printf("MSC: session ended %d:%d\n", who, cic);
+		assert(status[i] != idle);
+		status[i] = idle;
+		if
+		:: (i == cic) ->			/* was active party */
+			i = 0;
+			do
+			:: i < NC && status[i] != idle ->	/* had party on hold */
+				cic = i;
+				child[cic]!onhook;	/* the call ended */
+				printf("MSC: control moves to %d:%d\n", who, cic);
+				break
+			:: else -> i++
+			:: i == NC ->
+				printf("MSC: call ends %d:%d\n", who, cic);
+call_ends:			cic = NC;
+				break
+			od
+		:: else
+		fi
+	od
+}
+
+proctype local_tpc()	/* the local switch */
+{	mtype what;
+	pid who;
+
+end:	do
+	:: tpc?what,who ->	/* forwards to handler */
+		handler[who]!what
+	od
+}
+
+init {
+	byte i;
+
+	atomic {
+		i = 0;
+		do
+		:: i < NS -> run user(i); i++
+		:: else   -> break
+		od;
+		run local_tpc();
+	}
+}

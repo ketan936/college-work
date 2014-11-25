@@ -1,0 +1,21 @@
+byte in1 ,in2 ,a, b, q ,r;
+bit load;
+proctype A() {
+  do
+  ::  (load == 1)  -> a=in1; b =in2; 
+                               q = 0;  load = 0;
+  ::  (load !=  1)  -> if 
+                              :: (a >= b) -> a =  a-b ; q = q+1;
+                              :: (b>a)   ->  r=a; break;
+                             fi
+  od
+}
+
+init {
+atomic { 
+in1 =7; in2=2;load=1; 
+printf("rem  =%d\n",r);
+
+run A() ;  
+}
+}

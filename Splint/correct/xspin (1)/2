@@ -1,0 +1,14 @@
+proctype A(int x ,y, q ; chan res)
+{
+  if 
+  :: (y>x) ->   res!q,x,x;
+  :: (y<=y) -> run A (x-y,y,q+1,res); 
+  fi
+}
+init {
+int q,r,t;
+chan w =[2] of  {int ,int, int };
+run A(7,3,0,w);
+w ? q,r,t ;
+printf("result %d %d %d",q,r,t);
+}

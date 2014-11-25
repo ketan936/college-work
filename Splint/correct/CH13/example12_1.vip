@@ -1,0 +1,4 @@
+<VIP>
+1 1 e offhook
+2 2 f onhook
+-1 2 c !dialtone

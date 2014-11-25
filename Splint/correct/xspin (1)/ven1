@@ -1,0 +1,29 @@
+mtype = {milk,plain,coin5,coin10};
+chan coin = [1] of {mtype};
+chan choc  =[1] of {mtype};
+
+proctype cus()
+{ 
+   do 
+   ::coin!coin5;
+     choc?milk;
+   ::coin!coin10;
+     choc?plain;
+ od
+
+}
+
+proctype ven()
+{
+  do 
+       ::coin?coin5;
+       choc!milk;
+      ::coin?coin10;
+       choc!plain;
+ od
+
+}
+init {
+run cus() ;run ven();
+
+}

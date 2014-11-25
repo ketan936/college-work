@@ -1,0 +1,38 @@
+#define MAXROOT 23170		/* sqrt(2^30) */
+
+/* Newton-Raphson Integer Sqrt and Binary Search Integer Sqrt */
+
+/* x_n+1 = x_n - ( x_n ^ 2 - number ) / 2 . x_n  */
+
+proctype sqrt(int x)
+{	int high=MAXROOT;
+	int low=0;
+	int x_n;
+	int new,delta;
+
+	x = x*10000;
+
+	assert(x >= 2 && x < MAXROOT*MAXROOT);
+
+	x_n = x/2;
+	delta = x_n;
+	do
+	:: new = x_n - (x_n/2 + x/(2*x_n));
+		printf("new: %d	delta %d\n", new, delta);
+	
+		if
+		:: (x_n == new) 
+		|| (x_n - new > 0 && x_n - new > delta)
+		|| (x_n - new < 0 && x_n - new < -delta) ->
+			break
+		:: else ->
+			delta = x_n - new;
+			x_n = new
+		fi
+	od;
+	printf("input %d; integer sqrt %d.%d\n", x, x_n/100, x_n%100);
+}
+
+init {
+	run sqrt(NUMBER);
+}

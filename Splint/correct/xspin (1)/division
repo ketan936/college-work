@@ -1,0 +1,22 @@
+proctype division (int x,y,q;chan res)
+{
+  int r,a; 
+   if
+   :: (x<y) ->res !q,x;
+   :: (x>=y)-> x=x-y;
+                   q=q+1;
+                   division (x,y,q,res); 
+   fi
+
+}
+init
+{
+  int q,r;
+  chan child = [1] of {	int ,int };
+  run division (7,3,0,child);
+  child ? q,r;
+  printf("%d\n",q);
+  printf("%d\n",r);
+
+
+} 

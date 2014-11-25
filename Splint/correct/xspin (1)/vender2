@@ -1,0 +1,30 @@
+mtype = { milk, plain };
+chan coin_channel = [1] of { byte };
+chan choc_channel = [1] of { mtype };
+byte milk_bars = 10, plain_bars = 5;
+int coin_box = 0;
+proctype customer()
+{
+	do
+	:: coin_channel!5;
+	   choc_channel?milk;
+	:: coin_channel!10;
+	   choc_channel?plain;
+	od
+}
+proctype vender()
+{
+	do
+	:: ((milk_bars > 0) && coin_channel?[5]) ->
+		coin_channel?5;
+		choc_channel!milk;
+		milk_bars = milk_bars-1;
+		coin_box = coin_box + 5;
+	:: ((plain_bars > 0) && coin_channel?[10]) ->
+		coin_channel?10;
+		choc_channel!plain;
+		plain_bars = plain_bars-1;
+		coin_box = coin_box + 10;
+	od
+}
+init { atomic { run vender(); run customer(); }}

@@ -1,0 +1,74 @@
+#define NC	4
+
+chan server = [NC] of { chan, int };
+
+inline compute(N, x)
+{	int y;
+
+	y = 1<<15;
+	x = 0;                    /* reset x   */
+	do
+	:: y > 0 ->
+		x = x^y;          /* set bit   */
+		if
+		:: x*x > N ->     /* too large */
+			x = x^y   /* clear bit */
+		:: else           /* leave set */
+		fi;
+		y = y>>1          /* next bit  */
+	:: else ->
+		break             /* done      */
+	od;
+}
+
+active proctype sqroot()
+{	chan who;
+	int n, val;
+
+	do
+	:: server?who,n ->
+		compute(n,val);
+		who!val
+	:: timeout ->
+		break
+	od
+}
+
+#if 0
+active [NC] proctype client()
+{	chan me = [0] of { int };
+	int val;
+
+	server!me(10*_pid) ->
+	me?val;
+	printf("integer sqrt(%d) = %d\en", 10*_pid, val)
+}
+#endif
+
+#if 0
+active [NC] proctype client()
+{	chan me = [0] of { int };
+	int v;
+
+	server!me(10*_pid) ->
+	me?v;
+	assert(v*v <= 10*_pid && (v+1)*(v+1) > 10*_pid)
+}
+#endif
+
+#if 1
+active proctype tester()
+{	chan me = [0] of { int };
+	int n, v;
+
+	if
+	:: n = -1	/* fails */
+	:: n = 0	/* ok */
+	:: n = 1023	/* ok */
+	:: n = 1<<29	/* ok */
+	:: n = 1<<30	/* fails */
+	fi;
+	server!me(n) -> me?v;
+	assert(v*v <= n && (v+1)*(v+1) > n)
+}
+#endif

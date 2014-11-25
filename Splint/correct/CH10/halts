@@ -1,0 +1,7 @@
+#!/bin/sh
+### program name: halts
+
+spin -a $1	# generate model
+cc -DSAFETY -o pan pan.c # compile it
+./pan | grep "errors: 0"	# run it and return exit status
+exit $?		# return exit status of grep command

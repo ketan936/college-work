@@ -1,0 +1,23 @@
+mtype = { coin5, coin10, milk, plain };
+chan coin_channel = [1] of { mtype };
+chan choc_channel = [1] of { mtype };
+
+proctype customer()
+{
+	do
+	:: coin_channel!coin5;
+	   choc_channel?milk;
+	:: coin_channel!coin10;
+	   choc_channel?plain;
+	od
+}
+proctype vender()
+{
+	do
+	:: coin_channel?coin5;
+	  choc_channel!milk;
+	:: coin_channel?coin10;
+	  choc_channel!plain;
+	od
+}
+init { atomic { run vender(); run customer(); }}

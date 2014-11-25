@@ -1,0 +1,30 @@
+#define N	4
+#define p	(x < N)
+
+int x = N;
+
+active proctype A()
+{
+	do
+	:: x%2 -> x = 3*x+1
+	od
+}
+
+active proctype B()
+{
+	do
+	:: !(x%2) -> x = x/2
+	od
+}
+
+never {    /* <>[]p */
+T0_init:
+        if
+        :: p -> goto accept_S4
+        :: true -> goto T0_init
+        fi;
+accept_S4:
+        if
+        :: p -> goto accept_S4
+        fi;
+}

@@ -1,0 +1,44 @@
+mtype = {milk,plain,coin5,coin10};
+chan coin = [1] of {mtype};
+chan choc  =[1] of {mtype};
+int coinb=0;
+int milkb=10;
+int plainb=5;
+proctype cus()
+{ 
+   do 
+   
+     ::coin!coin5;
+     choc?milk;
+     
+  
+   ::coin!coin10;
+     choc?plain;
+
+ od
+
+}
+
+proctype ven()
+{
+   do 
+      
+       ::(milkb>0 && coin?coin5) ->
+      coin?coin5;
+       choc!milk;
+       coinb=coinb+5;
+       milkb=milkb-1;
+     ::(plainb>0 && coin?coin10) ->
+ 
+      coin?coin10;
+       choc!plain;
+      coinb=coinb+10;
+      plainb=plainb-1;
+assert( plainb>0)
+ od
+
+}
+init {
+run cus() ;run ven();
+
+}

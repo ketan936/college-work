@@ -1,0 +1,4 @@
+<VIP-SYMBOLS>
+%TE	"offhook"	"(last_sent == offhook)"
+%TE	"onhook"	"(last_sent == onhook)"
+%TC	"nodialtone"	"!(session_ss7@Dial)"

@@ -1,0 +1,25 @@
+%F thought.c
+%X -a user
+%D
+typedef struct R {
+	int lock;
+	int wanted;
+} R;
+%%
+%P
+#define N	3
+mtype = { Wakeme, Running };
+mtype pstate[N] = Running;
+
+#include "uts_lib.h"
+#include "_modex_user.spn"
+%%
+%L
+Import	_all_	_all_
+
+spinlock(&(lk))	spinlock(lk)
+waitlock(&(lk))	waitlock(lk)
+freelock(&(lk))	freelock(lk)
+sleepl(r,&(lk))	sleepl(_, lk)
+wakeup(r)	wakeup(_)
+%%

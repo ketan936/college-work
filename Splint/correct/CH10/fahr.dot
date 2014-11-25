@@ -1,0 +1,32 @@
+digraph dodot {
+	ratio=auto;
+N00 [label="main"];
+N00 -> N268693016;
+N268693016 [label="fahr.c : 4 : TN_FUNC_DECL <0> :  : "];
+N268693016 -> N268693744;
+N268693744 [label="fahr.c : 5 : TN_DECL <0> : int lower,upper,step;  : [O: step=T upper=T lower=T ] "];
+N268693744 -> N268694080;
+N268694080 [label="fahr.c : 6 : TN_DECL <0> : float fahr,celsius;  : [O: celsius=T fahr=T ] "];
+N268694080 -> N268694248;
+N268694248 [label="fahr.c : 8 : TN_ASSIGN <0> : lower=0 : [O: lower=D ] "];
+N268694248 -> N268694528;
+N268694528 [label="fahr.c : 9 : TN_ASSIGN <0> : upper=300 : [O: upper=D ] "];
+N268694528 -> N268694808;
+N268694808 [label="fahr.c : 10 : TN_ASSIGN <0> : step=20 : [O: step=D ] "];
+N268694808 -> N268695088;
+N268695088 [label="fahr.c : 12 : TN_ASSIGN <0> : fahr=lower : [O: fahr=D lower=U ] "];
+N268695088 -> N268695256;
+N268695256 [label="fahr.c : 13 : TN_WHILE <0> : (fahr<=upper) : "];
+N268695256 -> N268714092;
+N268714092 [label="fahr.c : 13 : TN_IF <1> : _L_  2 : [O: upper=U fahr=U ] "];
+N268714092 -> N268695760;
+N268695760 [label="fahr.c : 14 : TN_ASSIGN <0> : celsius=((5/9)*(fahr-32)) : [O: celsius=D fahr=U ] "];
+N268695760 -> N268696376;
+N268696376 [label="fahr.c : 15 : TN_FUNC_CALL <0> : printf() : [O: celsius=U fahr=U printf=F ] "];
+N268696376 -> N268696880;
+N268696880 [label="fahr.c : 16 : TN_ASSIGN <0> : fahr=(fahr+step) : [O: fahr=D step=U fahr=U ] "];
+N268696880 -> N268714092;
+N268714092 -> N268713584;
+N268713584 [label="fahr.c after 'while' : 13 : TN_LABEL <0> : _L_  2:\n : "];
+
+}
