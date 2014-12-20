@@ -11,7 +11,7 @@ struct node
 
 struct node* new_node(int data)
 {
-	struct node* node = (struct node*) malloc((sizeof(struct node));
+	struct node* node = (struct node*)malloc (sizeof(struct node));
 	node->data = data;
 	node->left = NULL;	
 	node->right = NULL;
@@ -19,7 +19,7 @@ struct node* new_node(int data)
 }
 
 
-void insert_node (struct node* node , int data)
+struct node* insert_node (struct node* node , int data)
 {
 	if (node == NULL)
 		return new_node(data);

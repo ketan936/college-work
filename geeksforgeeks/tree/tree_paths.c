@@ -14,6 +14,7 @@ struct node* new_node(int data)
 	node->data = data;
 	node->left = NULL;
 	node->right = NULL;
+	return node;
  
 }
 
@@ -41,8 +42,8 @@ void tree_paths(struct node* node,int  path[],int pathlen)
 	{
 		tree_print(path,pathlen);
 	}else{
-		tree_paths(node->left,path,pathlen)
-		tree_path(node->right,path,pathlen)
+		tree_paths(node->left,path,pathlen);
+		tree_paths(node->right,path,pathlen);
 	
 	}	
 

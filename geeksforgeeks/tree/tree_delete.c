@@ -13,7 +13,7 @@ struct node* new_node(int data)
 	node->data = data;
 	node->left = NULL;
 	node->right = NULL;
-	
+	return node;
 }
 
 void tree_delete(struct node* node)
