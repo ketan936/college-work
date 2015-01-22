@@ -5,25 +5,22 @@
 #include <stdlib.h>
 #include <sys/socket.h>
 // Handle error with user msg
-enum sizeConstants
-{
-        MAXSTRINGLENGTH = 128, BUFSIZE = 512,
+enum sizeConstants {
+	MAXSTRINGLENGTH = 128, BUFSIZE = 512,
 };
-void DieWithUserMessage(const char *msg, const char *detail)
-{
+void DieWithUserMessage(const char *msg, const char *detail) {
 
-        fputs(msg, stderr);
-        fputs(":", stderr);
-        fputs(detail, stderr);
-        fputc('\n', stderr);
-        exit(1);
+	fputs(msg, stderr);
+	fputs(":", stderr);
+	fputs(detail, stderr);
+	fputc('\n', stderr);
+	exit(1);
 
 }
 
-void DieWithSystemMessage(const char *msg)
-{
-        perror(msg);
-        exit(1);
+void DieWithSystemMessage(const char *msg) {
+	perror(msg);
+	exit(1);
 }
 
 // Handle error with sys msg
@@ -36,29 +33,39 @@ int SetupTCPServerSocket(const char *service);
 // Accept a new TCP connection on a server socket
 int AcceptTCPConnection(int servSock);
 // Handle new TCP client
-void HandleTCPClient(int clntSocket)
-{
-        char buffer[BUFSIZE]; // Buffer for echo string
+void HandleTCPClient(int clntSocket) {
+
+	FILE *fp;
+	char buffer[BUFSIZE]; // Buffer for echo string
 // Receive message from client
-        ssize_t numBytesRcvd = recv(clntSocket, buffer, BUFSIZE, 0);
-        if (numBytesRcvd < 0)
-                DieWithSystemMessage("recv() failed");
-// Send received string and receive again until end of stream
-        while (numBytesRcvd > 0) { // 0 indicates end of stream
-// Echo message back to client
-                ssize_t numBytesSent = send(clntSocket, buffer, numBytesRcvd,
-                                0);
-                if (numBytesSent < 0)
-                        DieWithSystemMessage("send() failed");
-                else if (numBytesSent != numBytesRcvd)
-                        DieWithUserMessage("send()",
-                                        "sent unexpected number of bytes");
-// See if there is more data to receive
-                numBytesRcvd = recv(clntSocket, buffer, BUFSIZE, 0);
-                if (numBytesRcvd < 0)
-                        DieWithSystemMessage("recv() failed");
-        }
-        close(clntSocket); // Close client socket
+	/*ssize_t numBytesRcvd = recv(clntSocket, buffer, BUFSIZE, 0);
+	 if (numBytesRcvd < 0)
+	 DieWithSystemMessage("recv() failed");
+	 // Send received string and receive again until end of stream
+	 while (numBytesRcvd > 0) { // 0 indicates end of stream
+	 // Echo message back to client
+	 ssize_t numBytesSent = send(clntSocket, buffer, numBytesRcvd,
+	 0);
+	 if (numBytesSent < 0)
+	 DieWithSystemMessage("send() failed");
+	 else if (numBytesSent != numBytesRcvd)
+	 DieWithUserMessage("send()",
+	 "sent unexpected number of bytes");
+	 // See if there is more data to receive
+	 numBytesRcvd = recv(clntSocket, buffer, BUFSIZE, 0);
+	 if (numBytesRcvd < 0)
+	 DieWithSystemMessage("recv() failed");
+	 }*/
+
+	fp = fopen("temp.txt", "r");
+	system(
+			"grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage \"%\"}' > temp.txt");
+	fgets(buffer, 256, fp);
+	ssize_t numBytesSent = send(clntSocket, buffer, 256, 0);
+	if (numBytesSent < 0)
+		DieWithSystemMessage("send() failed");
+
+	close(clntSocket); // Close client socket
 }
 
 int SetupTCPClientSocket(const char *server, const char *service);
