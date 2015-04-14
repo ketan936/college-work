@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+	version="2.0">
+	<persistence-unit name="test-cabinet"
+		transaction-type="RESOURCE_LOCAL">
+		<provider>org.hibernate.ejb.HibernatePersistence</provider>
+		<class>com.castle.demo.domain.Employee</class>
+		<class>com.castle.demo.domain.Customer</class>
+		<class>com.castle.demo.domain.Office</class>
+		<class>com.castle.demo.domain.Order</class>
+		<class>com.castle.demo.domain.OrderDetail</class>
+		<class>com.castle.demo.domain.Payment</class>
+		<class>com.castle.demo.domain.Product</class>
+		<class>com.castle.demo.domain.ProductLine</class>
+		<properties>
+			<!-- <property name="hibernate.ejb.naming_strategy" value="org.hibernate.cfg.ImprovedNamingStrategy" /> -->
+			<property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect" />
+			<property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver" />
+			<property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/classicmodels" />
+			<property name="javax.persistence.jdbc.user" value="root" />
+			<property name="javax.persistence.jdbc.password" value="" />
+			<property name="hibernate.show_sql" value="true" />
+			<property name="hibernate.format_sql" value="true" />
+		<!-- 	<property name="hibernate.hbm2ddl.auto" value="update" /> -->
+		</properties>
+	</persistence-unit>
+
+</persistence>
+
