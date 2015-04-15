@@ -3,6 +3,7 @@ package com.castle.demo;
 import javax.ws.rs.Produces;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -41,6 +42,8 @@ public class MyApplication extends GuiceServletContextListener {
 	    public JacksonJsonProvider createJacksonJsonProvider()
 	    {
 	        ObjectMapper objectMapper = new ObjectMapper();
+	        objectMapper.setPropertyNamingStrategy(
+	        	    PropertyNamingStrategy.CAMEL_CASE_TO_LOWER_CASE_WITH_UNDERSCORES);
 	      //  objectMapper.setPropertyNamingStrategy(new MyPropertyNamingStrategy());
 	        return new JacksonJsonProvider(objectMapper);
 	    }

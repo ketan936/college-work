@@ -6,24 +6,41 @@ import java.util.List;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
+import org.hibernate.validator.constraints.NotEmpty;
 @Entity
 @Table(name = "offices")
 @Access(AccessType.FIELD)
 public class Office {
 	@Id
+	@Column(unique = true, nullable = false)
 	private String officeCode;
+
+    @NotEmpty(message = "City may not be null")
+    @Column(nullable = false)
 	private String city;
+    @NotEmpty(message = "Phone may not be null")
+    @Column(unique = true, nullable = false)
 	private String phone;
+    @NotEmpty(message = "City may not be null")
+    @Column(nullable = false)
 	private String addressLine1;
 	private String addressLine2;
 	private String state;
+	@NotEmpty(message = "Country may not be null")
+    @Column(nullable = false)
 	private String country;
+	@NotEmpty(message = "Postal Code may not be null")
+    @Column(nullable = false)
 	private String postalCode;
+	@NotEmpty(message = "Territory may not be null")
+    @Column(nullable = false)
 	private String territory;
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "office", orphanRemoval = true)
 	private List<Employee> employees = new ArrayList<Employee>();
