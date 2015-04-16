@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Implementation-Title: hibernate-example
+Implementation-Version: 1.0-SNAPSHOT
+Implementation-Vendor-Id: com.castle.demo
+Build-Jdk: 1.6.0_29
+Built-By: ketan.gupta
+Created-By: Apache Maven
+Main-Class: com.castle.demo.App
+Archiver-Version: Plexus Archiver

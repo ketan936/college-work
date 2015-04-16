@@ -1,0 +1,10 @@
+Feb 28 07:32:36 castle-Inspiron-3442 dnsmasq[1728]: reading /etc/resolv.conf
+Feb 28 07:32:36 castle-Inspiron-3442 dnsmasq[1728]: using nameserver 127.0.1.1#53
+Feb 28 07:35:47 castle-Inspiron-3442 anacron[1156]: Job `cron.daily' started
+Feb 28 07:35:47 castle-Inspiron-3442 anacron[3275]: Updated timestamp for job `cron.daily' to 2015-02-28
+Feb 28 07:37:36 castle-Inspiron-3442 kernel: [  403.151381] Hello World!
+Feb 28 07:38:32 castle-Inspiron-3442 kernel: [  436.643228] Goodbye WorldHello World!
+Feb 28 07:39:01 castle-Inspiron-3442 CRON[3746]: (root) CMD (  [ -x /usr/lib/php5/maxlifetime ] && [ -x /usr/lib/php5/sessionclean ] && [ -d /var/lib/php5 ] && /usr/lib/php5/sessionclean /var/lib/php5 $(/usr/lib/php5/maxlifetime))
+Feb 28 07:40:10 castle-Inspiron-3442 kernel: [  493.330771] Goodbye World<7>[  591.272455] Hello World 
+Feb 28 07:40:28 castle-Inspiron-3442 kernel: [  608.625803] Goodbye World 
+Feb 28 07:40:39 castle-Inspiron-3442 kernel: [  619.602980] Hello World 
