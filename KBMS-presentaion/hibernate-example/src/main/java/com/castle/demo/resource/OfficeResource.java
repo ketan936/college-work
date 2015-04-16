@@ -7,7 +7,9 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -24,15 +26,39 @@ public class OfficeResource {
 	OfficeRepository officeRepository;
 
 	@Inject
-	public OfficeResource(CreateEntityManagerFactory createEntityManagerFactory, OfficeRepository officeRepository) {
-	
+	public OfficeResource(
+			CreateEntityManagerFactory createEntityManagerFactory,
+			OfficeRepository officeRepository) {
+
 		this.officeRepository = officeRepository;
 	}
 
 	@GET
+	@Path("/all")
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<Office> getOffice() {
-		return officeRepository.getOffice();
+	public List<Office> getOffices() {
+		return officeRepository.getOffices();
+	}
+
+	@GET
+	@Path("/{city}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public List<Office> getOfficeByCity(@PathParam("city") String city) {
+		return officeRepository.getOfficeByCity(city);
+	}
+
+	@GET
+	public List<Office> searchOffices(
+			@QueryParam("officeCode") String officeCode,
+			@QueryParam("city") String city, @QueryParam("phone") String phone,
+			@QueryParam("state") String state,
+			@QueryParam("postalCode") String postalCode,
+			@QueryParam("country") String country,
+			@QueryParam("territory ") String territory) {
+
+		return officeRepository.searchOffices(officeCode, city, phone, state,
+				postalCode, country, territory);
+
 	}
 
 	@POST
