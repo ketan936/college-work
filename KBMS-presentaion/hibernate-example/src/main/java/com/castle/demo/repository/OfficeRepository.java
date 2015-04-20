@@ -116,4 +116,9 @@ public class OfficeRepository {
 		return entityManager.createQuery(query).getResultList();
 
 	}
+
+	public void DeleteOfficeById(String id) {
+		// TODO Auto-generated method stub
+	}
+	
 }
