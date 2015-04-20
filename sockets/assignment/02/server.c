@@ -33,8 +33,6 @@ int main(int argc, char *argv[])
 	time_t rawtime;
 	struct tm * timeinfo;
 
-	time(&rawtime);
-	timeinfo = localtime(&rawtime);
 
 	// Construct local address structure
 	struct sockaddr_in servAddr;
@@ -62,6 +60,9 @@ int main(int argc, char *argv[])
 		char clntName[INET_ADDRSTRLEN]; // String to contain client address
 		if (inet_ntop(AF_INET, &clntAddr.sin_addr.s_addr, clntName,
 				sizeof(clntName)) != NULL) {
+			time(&rawtime);
+			timeinfo = localtime(&rawtime);
+
 			printf("Handling client %s/%d\n", clntName,
 					ntohs(clntAddr.sin_port));
 			printf("Current local time and date: %s", asctime(timeinfo));
