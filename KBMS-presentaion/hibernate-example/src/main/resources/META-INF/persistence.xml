@@ -12,6 +12,8 @@
 		<class>com.castle.demo.domain.Payment</class>
 		<class>com.castle.demo.domain.Product</class>
 		<class>com.castle.demo.domain.ProductLine</class>
+		<class>com.castle.demo.helper.PaymentId</class>
+		
 		<properties>
 			<!-- <property name="hibernate.ejb.naming_strategy" value="org.hibernate.cfg.ImprovedNamingStrategy" /> -->
 			<property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect" />
