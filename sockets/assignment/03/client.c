@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
                                 "<Server Address> <Echo Word> [<Server Port>]");
         char *servIP = argv[1];
 // First arg: server IP address (dotted quad)
-        char echoString[256]; // Second arg: string to echo
+         // Second arg: string to echo
 // Third arg (optional): server port (numeric). 7 is well-known echo port
         in_port_t servPort = (argc == 4) ? atoi(argv[3]) : 7;
 // Create a reliable, stream socket using TCP
@@ -41,11 +41,18 @@ int main(int argc, char *argv[])
         if (connect(sock, (struct sockaddr *) &servAddr, sizeof(servAddr)) < 0)
                 DieWithSystemMessage("connect() failed");
         for(;;){
-        printf("enter message");
-               gets(echoString);
+
+                char echoString[256];
+                memset(&echoString, 0, 256);
+        fputs("enter message: ", stdout);
+        fputs("test ", stdout);
+        fgets(echoString, sizeof(echoString), stdin);
+        fputs("test2 ", stdout);
         size_t echoStringLen = strlen(echoString); // Determine input length
 // Send the string to the server
+
         ssize_t numBytes = send(sock, echoString, echoStringLen, 0);
+
         if (numBytes < 0)
                 DieWithSystemMessage("send() failed");
         else if (numBytes != echoStringLen)
@@ -54,7 +61,7 @@ int main(int argc, char *argv[])
         unsigned int totalBytesRcvd = 0; // Count of total bytes received
         fputs("Received: ", stdout);
 // Setup to print the echoed string
-        while (totalBytesRcvd < echoStringLen) {
+
                 char buffer[BUFSIZE]; // I/O buffer
                 /* Receive up to the buffer size (minus 1 to leave space for
                  a null terminator) bytes from the sender */
@@ -69,7 +76,7 @@ int main(int argc, char *argv[])
 // Terminate the string!
                 fputs(buffer, stdout);
 // Print the echo buffer
-        }
+
         fputc('\n', stdout); // Print a final linefeed
 }
         close(sock);

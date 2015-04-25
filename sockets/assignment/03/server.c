@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
 	// Mark the socket so it will listen for incoming connections
 	if (listen(servSock, MAXPENDING) < 0)
 		DieWithSystemMessage("listen() failed");
-	for (;;) { // Run forever
+	 // Run forever
 		struct sockaddr_in clntAddr; // Client address
 		// Set length of client address structure (in-out parameter)
 		socklen_t clntAddrLen = sizeof(clntAddr);
@@ -58,16 +58,12 @@ int main(int argc, char *argv[])
 			DieWithSystemMessage("accept() failed");
 		// clntSock is connected to a client!
 		char clntName[INET_ADDRSTRLEN]; // String to contain client address
-		if (inet_ntop(AF_INET, &clntAddr.sin_addr.s_addr, clntName,
+		/*if (inet_ntop(AF_INET, &clntAddr.sin_addr.s_addr, clntName,
 				sizeof(clntName)) != NULL) {
-			time(&rawtime);
-			timeinfo = localtime(&rawtime);
 
-			printf("Handling client %s/%d\n", clntName,
-					ntohs(clntAddr.sin_port));
-			printf("Current local time and date: %s", asctime(timeinfo));
 		} else
-			puts("Unable to get client address");
+			puts("Unable to get client address");*/
+		for (;;) {
 		HandleTCPClient(clntSock);
 	}
 	// NOT REACHED
