@@ -3,7 +3,7 @@
  * It was generated using rpcgen.
  */
 
-#include "calc.h"
+#include "quiz.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <rpc/pmap_clnt.h>
@@ -17,10 +17,10 @@
 #endif
 
 static void
-calc_prog_1(struct svc_req *rqstp, register SVCXPRT *transp)
+quiz_prog_1(struct svc_req *rqstp, register SVCXPRT *transp)
 {
 	union {
-		input_calc calculator_1_arg;
+		input_quiz quiz_ans_1_arg;
 	} argument;
 	char *result;
 	xdrproc_t _xdr_argument, _xdr_result;
@@ -31,10 +31,16 @@ calc_prog_1(struct svc_req *rqstp, register SVCXPRT *transp)
 		(void) svc_sendreply (transp, (xdrproc_t) xdr_void, (char *)NULL);
 		return;
 
-	case CALCULATOR:
-		_xdr_argument = (xdrproc_t) xdr_input_calc;
-		_xdr_result = (xdrproc_t) xdr_float;
-		local = (char *(*)(char *, struct svc_req *)) calculator_1_svc;
+	case QUIZ_QUES:
+		_xdr_argument = (xdrproc_t) xdr_void;
+		_xdr_result = (xdrproc_t) xdr_output_quiz;
+		local = (char *(*)(char *, struct svc_req *)) quiz_ques_1_svc;
+		break;
+
+	case QUIZ_ANS:
+		_xdr_argument = (xdrproc_t) xdr_input_quiz;
+		_xdr_result = (xdrproc_t) xdr_output_quiz;
+		local = (char *(*)(char *, struct svc_req *)) quiz_ans_1_svc;
 		break;
 
 	default:
@@ -62,15 +68,15 @@ main (int argc, char **argv)
 {
 	register SVCXPRT *transp;
 
-	pmap_unset (CALC_PROG, CALC_VERS);
+	pmap_unset (QUIZ_PROG, QUIZ_VERS);
 
 	transp = svcudp_create(RPC_ANYSOCK);
 	if (transp == NULL) {
 		fprintf (stderr, "%s", "cannot create udp service.");
 		exit(1);
 	}
-	if (!svc_register(transp, CALC_PROG, CALC_VERS, calc_prog_1, IPPROTO_UDP)) {
-		fprintf (stderr, "%s", "unable to register (CALC_PROG, CALC_VERS, udp).");
+	if (!svc_register(transp, QUIZ_PROG, QUIZ_VERS, quiz_prog_1, IPPROTO_UDP)) {
+		fprintf (stderr, "%s", "unable to register (QUIZ_PROG, QUIZ_VERS, udp).");
 		exit(1);
 	}
 
@@ -79,8 +85,8 @@ main (int argc, char **argv)
 		fprintf (stderr, "%s", "cannot create tcp service.");
 		exit(1);
 	}
-	if (!svc_register(transp, CALC_PROG, CALC_VERS, calc_prog_1, IPPROTO_TCP)) {
-		fprintf (stderr, "%s", "unable to register (CALC_PROG, CALC_VERS, tcp).");
+	if (!svc_register(transp, QUIZ_PROG, QUIZ_VERS, quiz_prog_1, IPPROTO_TCP)) {
+		fprintf (stderr, "%s", "unable to register (QUIZ_PROG, QUIZ_VERS, tcp).");
 		exit(1);
 	}
 
