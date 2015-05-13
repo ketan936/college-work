@@ -1,0 +1,3 @@
+Cpupool Pool-0: tslice=30ms ratelimit=1000us
+Name                                ID Weight  Cap
+Domain-0                             0    256    0
