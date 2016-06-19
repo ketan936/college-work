@@ -9,7 +9,7 @@ using namespace std;
 
 int main()
 {
-	double old1=0,old2=0,mem1,mem2;
+	double old1=0,old2=0,mem1,mem2,,mem3
 	int cnt=0;
 	double new1=0,new2=0;
     while(true)
